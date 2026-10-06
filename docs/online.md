@@ -129,6 +129,7 @@ docker compose logs -f servidor web          # ver qué pasa
 git pull && ./start.sh online                # actualizar a la última versión
 bash cerrar.sh "Volvemos mañana a las 20 h"  # cerrar: cartel en la página y salas apagadas
 bash abrir.sh                                # abrir de nuevo
+bash estadisticas.sh                         # link a las estadísticas: cuánta gente entra y quién jugó
 ```
 
 - **Agregar salas:** editá `config/salas.conf` y corré `./start.sh online`.
@@ -152,6 +153,9 @@ bash abrir.sh                                # abrir de nuevo
   la administración remota (RCON) no se acepta desde internet: el puente descarta esos
   paquetes. Para administrar: `./servidor.sh` en el servidor.
 - Contraseñas (`.env`, `config/server.cfg`) solo en el servidor: no están en git.
+- Estadísticas (`/estadisticas`, con su propia clave en `.env`): visitas contadas con un
+  número al azar de cada navegador, y el nombre y la duración de cada partida. No se
+  guardan IPs. Quedan en `metricas/` en el servidor (no van a git).
 - Con contraseña de servidor, después de 10 intentos fallidos en 10 minutos esa IP
   tiene que esperar. SSH queda protegido con `fail2ban`.
 - La web limita las conexiones por IP (`MAX_POR_IP`, 4 por defecto) y el cupo de cada

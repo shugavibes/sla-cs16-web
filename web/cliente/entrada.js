@@ -233,6 +233,18 @@ window.addEventListener('keydown', (e) => {
         .catch((err) => console.error('[manos]', err));
 }, true);
 
+// ------------------------------------------------------------- métricas
+// Cuenta la visita (para /estadisticas): un número al azar que queda en este navegador, sin
+// nada personal. La misma persona recargando la página no suma de nuevo.
+function anotarVisita() {
+    let id = leer('cs16:visitante');
+    if (!id || !/^[A-Za-z0-9_-]{8,40}$/.test(id)) {
+        id = (crypto.randomUUID?.() || `${Date.now()}${Math.random()}`).replace(/[^A-Za-z0-9]/g, '').slice(0, 24);
+        guardar('cs16:visitante', id);
+    }
+    fetch(`/api/visita?id=${encodeURIComponent(id)}`, { cache: 'no-store', keepalive: true }).catch(() => {});
+}
+
 // ------------------------------------------------------ sin pantalla completa
 // La página ya no se pone en pantalla completa sola: al salir de ella la vista quedaba
 // trabada (y con un clic volvía a entrar). Quien quiera, la pone con el navegador.
@@ -310,6 +322,7 @@ if (form && jugar && lobby && !document.querySelector('.cs16-equipo')) {
     actualizarSalas(cajaSalas);
     setInterval(() => { if (!lobby.hidden) actualizarSalas(cajaSalas); }, 5000);
 
+    anotarVisita();
     revisarCerrado();   // ./cerrar.sh en el servidor: cartel de «Cerrado por ahora» y sin «Jugar»
     vigilar();   // si se corta la conexión con la sala, cartel con «Volver a entrar»
     agrandarTextos({ elegida: params.get('hud') });   // nombres, muertes y chat legibles en Retina y celulares

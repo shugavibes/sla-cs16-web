@@ -62,6 +62,8 @@ services:
       ARCHIVOS: "${ARCHIVOS:-servidor}"
       CONFIAR_PROXY: "${CONFIAR_PROXY:-0}"
       MAX_POR_IP: "${MAX_POR_IP:-4}"
+      CLAVE_ESTADISTICAS: "${CLAVE_ESTADISTICAS:-}"   # clave de /estadisticas (la genera start.sh)
+      METRICAS: /data/metricas
       DATOS: /data/build
       MARCA: /data/marca/web
       SALAS: /config/salas.conf
@@ -70,6 +72,7 @@ services:
       - ./marca:/data/marca:ro              # logo, colores y textos de la página: se ven al recargar
       - ./web/cliente:/app/cliente:ro       # salas, equipo, archivos propios, manos: idem
       - ./config/salas.conf:/config/salas.conf:ro
+      - ./metricas:/data/metricas           # cuánta gente entra (lo único que la web escribe)
     read_only: true
     tmpfs:
       - /tmp

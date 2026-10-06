@@ -95,6 +95,7 @@ paso "Preparando la configuración ($MODO)"
 touch .env
 chmod 600 .env
 [ -n "$(env_get RCON_PASSWORD)" ] || env_set RCON_PASSWORD "$(od -An -N16 -tx1 /dev/urandom | tr -d ' \n')"
+[ -n "$(env_get CLAVE_ESTADISTICAS)" ] || env_set CLAVE_ESTADISTICAS "$(od -An -N8 -tx1 /dev/urandom | tr -d ' \n')"
 [ -n "$(env_get NOMBRE_SERVIDOR)" ] || env_set NOMBRE_SERVIDOR "SLA · Counter-Strike 1.6"
 [ -n "$(env_get MAPA)" ] || env_set MAPA "de_dust2"
 [ -n "$(env_get MAX_JUGADORES)" ] || env_set MAX_JUGADORES "12"
@@ -170,7 +171,9 @@ sed -e "s/{{RCON}}/$(limpiar "$(env_get RCON_PASSWORD)")/" -e "s/{{CHEATS}}/$TRA
   config/server.cfg.template > config/server.cfg.tmp
 mv config/server.cfg.tmp config/server.cfg
 chmod 644 config/server.cfg
-mkdir -p build texturas mapas
+mkdir -p build texturas mapas metricas
+# la web corre con el usuario 1000 y guarda ahí las métricas
+if [ "$(uname -s)" = Linux ] && [ "$(id -u)" = 0 ]; then chown 1000:1000 metricas; fi
 ok "Configuración lista (contraseñas en .env; archivos del juego: $(env_get ARCHIVOS))"
 
 PERFIL=()
@@ -218,6 +221,7 @@ fi
 
 printf '\n  %s✅ Listo%s\n\n' "$_B" "$_N"
 printf '  Juego:    %s\n' "$URL"
+printf '  Estadísticas: %s/estadisticas?clave=%s   (cuánta gente entra; también: bash estadisticas.sh)\n' "$URL" "$(env_get CLAVE_ESTADISTICAS)"
 printf '  Estudio:  http://localhost:27080   (solo desde esta compu%s)\n' "$( [ "$MODO" = online ] && printf '; desde la tuya: ssh -L 27080:localhost:27080 este-servidor' )"
 case "$MODO" in
   lan) printf '\n  Pasale el link del juego a quien esté en tu misma red.\n' ;;

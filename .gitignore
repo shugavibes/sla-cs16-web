@@ -17,3 +17,6 @@ __pycache__/
 
 # «Cerrado por ahora» (lo crea cerrar.sh en el servidor)
 marca/web/cerrado.txt
+
+# métricas de la web (start.sh)
+metricas/

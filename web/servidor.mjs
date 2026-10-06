@@ -12,6 +12,7 @@ import { WebSocketServer } from 'ws';
 import { RtcBridge } from './rtc.mjs';
 import { consultarInfo } from './consulta.mjs';
 import { cargarSalas } from './salas.mjs';
+import { Metricas, paginaClave, paginaEstadisticas, resumir } from './metricas.mjs';
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const env = (k, d) => (process.env[k] ?? '').trim() || d;
@@ -41,6 +42,10 @@ const cfg = {
     maxPorIp: Number(env('MAX_POR_IP', '4')),
     // Detrás de Caddy (modo online) la IP real del jugador viene en X-Forwarded-For
     confiarProxy: env('CONFIAR_PROXY', '0') === '1',
+    // métricas: dónde se guardan, la clave de /estadisticas y la zona horaria de los días
+    metricasDir: env('METRICAS', path.join(HERE, 'metricas')),
+    claveEstadisticas: env('CLAVE_ESTADISTICAS', ''),
+    zona: env('ZONA_HORARIA', 'America/Argentina/Buenos_Aires'),
 };
 
 const MIME = {
@@ -391,6 +396,15 @@ function handler(req, res) {
         return sendFile(req, res, path.join(cfg.data, 'mod.zip'), 'no-store', leerMod()?.version);
     }
 
+    if (pathname === '/api/visita') {
+        metricas.visita(url.searchParams.get('id'));
+        res.writeHead(204, { 'Cache-Control': 'no-store', ...SECURITY });
+        res.end();
+        return;
+    }
+
+    if (pathname === '/estadisticas') return sendEstadisticas(req, res, url);
+
     if (pathname === '/' || pathname === '/index.html') return sendIndex(req, res);
     if (pathname.startsWith('/cliente/')) return servirDe(CLIENTE, pathname.slice('/cliente/'.length), req, res);
     if (pathname.startsWith('/marca/')) return servirDe(MARCA, pathname.slice('/marca/'.length), req, res);
@@ -401,11 +415,49 @@ function handler(req, res) {
     return servirDe(PUBLIC, rel, req, res, immutable ? 'public, max-age=31536000, immutable' : 'no-cache');
 }
 
+// -------------------------------------------------------------- métricas
+const metricas = new Metricas(cfg.metricasDir, { log });
+metricas.anotar({ tipo: 'inicio' });
+
+function claveEstadisticasOk(dada) {
+    const a = Buffer.from(String(dada || ''));
+    const b = Buffer.from(cfg.claveEstadisticas);
+    return b.length > 0 && a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
+function sendHtml(res, status, html) {
+    const body = Buffer.from(html);
+    res.writeHead(status, {
+        'Content-Type': MIME['.html'], 'Content-Length': body.length, 'Cache-Control': 'no-store',
+        'X-Robots-Tag': 'noindex', ...SECURITY,
+    });
+    res.end(body);
+}
+
+function sendEstadisticas(req, res, url) {
+    if (!cfg.claveEstadisticas) return sendText(res, 404, 'Las estadísticas no están activadas en este servidor.');
+    const ip = ipDe(req);
+    if (demasiadosFallos(ip)) return sendText(res, 429, 'Demasiados intentos: probá de nuevo en unos minutos.');
+    const clave = url.searchParams.get('clave');
+    if (!claveEstadisticasOk(clave)) {
+        if (clave) anotarFallo(ip);
+        return sendHtml(res, clave ? 403 : 200, paginaClave({ error: Boolean(clave) }));
+    }
+    const ahora = Date.now();
+    const resumen = resumir(metricas.leer(ahora - 15 * 24 * 60 * 60 * 1000), { zona: cfg.zona, ahora });
+    const enLinea = [...bridge.peers].filter((p) => p.open).map((p) => ({ sala: p.sala, nombre: p.nombre, desde: p.desde }));
+    return sendHtml(res, 200, paginaEstadisticas({ resumen, enLinea, salas, nombre: cfg.hostname, zona: cfg.zona, ahora }));
+}
+
 // --------------------------------------------------------------- WebRTC
 cfg.maxPeers = salas.reduce((n, s) => n + s.maxJugadores + 2, 0) + 4;
 const bridge = new RtcBridge(cfg);
 bridge.on('join', (p) => log(`[web] jugador conectado a la sala ${p.sala} (${bridge.count} en línea)`));
-bridge.on('leave', (p, why) => log(`[web] jugador desconectado de la sala ${p.sala}: ${why} (${bridge.count} en línea)`));
+bridge.on('jugando', (p) => metricas.entra(p));
+bridge.on('leave', (p, why) => {
+    log(`[web] jugador desconectado de la sala ${p.sala}: ${why} (${bridge.count} en línea)`);
+    if (p.nombre) metricas.sale(p);
+});
 
 function ipDe(req) {
     const directa = (req.socket.remoteAddress || '').replace(/^::ffff:/, '');
