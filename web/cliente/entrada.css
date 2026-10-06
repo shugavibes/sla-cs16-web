@@ -298,3 +298,29 @@ body.playing.cs16-tactil-on .cs16-tactil { display: flex; }
 .cs16-corte-caja h2 { margin: 0 0 8px; font-size: 18px; }
 .cs16-corte-caja p { margin: 0 0 16px; color: var(--muted, #a4a4a4); font-size: 14px; line-height: 1.45; }
 .cs16-corte-caja button { width: 100%; margin: 0; }
+
+/* cerrado.js: «Cerrado por ahora» (./cerrar.sh en el servidor) */
+.cs16-cerrado {
+    position: fixed;
+    inset: 0;
+    z-index: 8;
+    display: grid;
+    place-items: center;
+    padding: 16px;
+    background: var(--bg, #0e0f0c);
+}
+.cs16-cerrado-caja {
+    width: min(460px, 100%);
+    padding: 32px 26px 26px;
+    border-radius: 16px;
+    background: var(--panel, #1f1f1f);
+    border: 1px solid var(--line, #ffffff1f);
+    color: var(--text, #f5f5f5);
+    font-family: "Geist", system-ui, sans-serif;
+    text-align: center;
+}
+.cs16-cerrado-caja img { width: 150px; height: auto; margin-bottom: 18px; }
+.cs16-cerrado-caja h1 { margin: 0 0 10px; font-size: 22px; }
+.cs16-cerrado-caja p { margin: 0 0 14px; font-size: 16px; line-height: 1.45; white-space: pre-line; }
+.cs16-cerrado-caja small { color: var(--muted, #a4a4a4); font-size: 12.5px; }
+body.cs16-esta-cerrado #lobby { visibility: hidden; }

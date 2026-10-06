@@ -13,6 +13,7 @@ import { agrandarTextos } from './textos.js';
 import { activarRadio } from './radio.js';
 import { activarTeclas } from './teclas.js';
 import { prepararGrafitis } from './grafitis.js';
+import { revisarCerrado } from './cerrado.js';
 
 const $ = (id) => document.getElementById(id);
 const form = $('form');
@@ -309,6 +310,7 @@ if (form && jugar && lobby && !document.querySelector('.cs16-equipo')) {
     actualizarSalas(cajaSalas);
     setInterval(() => { if (!lobby.hidden) actualizarSalas(cajaSalas); }, 5000);
 
+    revisarCerrado();   // ./cerrar.sh en el servidor: cartel de «Cerrado por ahora» y sin «Jugar»
     vigilar();   // si se corta la conexión con la sala, cartel con «Volver a entrar»
     agrandarTextos({ elegida: params.get('hud') });   // nombres, muertes y chat legibles en Retina y celulares
     activarRadio();                                    // menús de radio visibles con Z, X y C

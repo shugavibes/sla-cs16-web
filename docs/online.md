@@ -127,6 +127,8 @@ En la carpeta del proyecto en el servidor:
 ./servidor.sh --todas "say Reinicio en 5 minutos"
 docker compose logs -f servidor web          # ver qué pasa
 git pull && ./start.sh online                # actualizar a la última versión
+bash cerrar.sh "Volvemos mañana a las 20 h"  # cerrar: cartel en la página y salas apagadas
+bash abrir.sh                                # abrir de nuevo
 ```
 
 - **Agregar salas:** editá `config/salas.conf` y corré `./start.sh online`.

@@ -14,3 +14,6 @@ __pycache__/
 .viejo/
 .manos-*.tar.gz
 .actualizacion-*.tar.gz
+
+# «Cerrado por ahora» (lo crea cerrar.sh en el servidor)
+marca/web/cerrado.txt
