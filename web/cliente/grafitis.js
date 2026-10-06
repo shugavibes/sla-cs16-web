@@ -2,9 +2,9 @@
 //
 // Cuando el juego carga sus archivos (los del servidor o los propios de cada jugador),
 // esta página pinta los grafitis de marca/web/grafitis/ encima de algunas texturas:
-//   - de_dust y de_dust2: «SLA» en aerosol en una de las dos piedras de pared que el juego
-//     reparte al azar (sale en más o menos la mitad de las paredes), el globo de SLA debajo
-//     de las ventanas y el logo en esténcil en los cajones grandes.
+//   - de_dust y de_dust2: el globo de SLA en aerosol en una de las dos piedras de pared que
+//     el juego reparte al azar (sale en más o menos la mitad de las paredes) y debajo de las
+//     ventanas, el globo en esténcil en los cajones y «SLA» en los cajones militares.
 //   - Todos los mapas: los aerosoles que tiran los bots (logos.cfg de YaPB) pasan a ser el
 //     logo, la palabra y el globo de SLA, en verde, negro y blanco.
 // Solo se cambian texturas que vienen en archivos .wad aparte del mapa: el mapa queda igual
@@ -19,21 +19,25 @@ const BLANCO = [236, 236, 230];
 const DECALS = ['cstrike/decals.wad', 'valve/decals.wad'];
 
 export const PARCHES = [
-    { archivos: ['cstrike/cs_dust.wad'], textura: '-1CSSANDWALL', tipo: 'pared', imagen: 'pared-sla.png' },
+    // El globo es simétrico: el juego muestra las texturas espejadas en la mitad de las
+    // paredes y un texto saldría al revés. Las letras van donde se ven al derecho.
+    { archivos: ['cstrike/cs_dust.wad'], textura: '-1CSSANDWALL', tipo: 'pared', imagen: 'pared-globo.png' },
     { archivos: ['cstrike/cs_dust.wad'], textura: 'SANDWLLWNDW', tipo: 'pared', imagen: 'ventana-logo.png' },
-    { archivos: ['cstrike/cs_dust.wad'], textura: 'SANDCRTLRGSD', tipo: 'pared', imagen: 'caja-logo.png' },
+    { archivos: ['cstrike/cs_dust.wad'], textura: 'SANDCRTLRGSD', tipo: 'pared', imagen: 'caja-globo.png' },
+    { archivos: ['cstrike/cs_dust.wad'], textura: 'SANDCRTSMSD', tipo: 'pared', imagen: 'caja-chica-globo.png' },
+    { archivos: ['cstrike/cs_dust.wad'], textura: 'MLTRYCRTESD', tipo: 'pared', imagen: 'caja-militar-sla.png' },
     // aerosoles de los bots: un solo color (el juego usa la imagen como transparencia)
     { archivos: DECALS, textura: '{GRAF003', tipo: 'calco', imagen: 'calco-palabra.png', color: VERDE },
     { archivos: DECALS, textura: '{GRAF004', tipo: 'calco', imagen: 'calco-sla.png', color: NEGRO },
-    { archivos: DECALS, textura: '{GRAF005', tipo: 'calco', imagen: 'calco-sla.png', color: VERDE },
+    { archivos: DECALS, textura: '{GRAF005', tipo: 'calco', imagen: 'calco-globo.png', color: VERDE },
     { archivos: DECALS, textura: '{BIOHAZ', tipo: 'calco', imagen: 'calco-globo.png', color: VERDE },
     { archivos: DECALS, textura: '{LAMBDA06', tipo: 'calco', imagen: 'calco-globo.png', color: NEGRO },
     { archivos: DECALS, textura: '{TARGET', tipo: 'calco', imagen: 'calco-palabra.png', color: BLANCO },
-    { archivos: DECALS, textura: '{HAND1', tipo: 'calco', imagen: 'calco-sla.png', color: BLANCO },
+    { archivos: DECALS, textura: '{HAND1', tipo: 'calco', imagen: 'calco-globo.png', color: BLANCO },
     { archivos: DECALS, textura: '{SPIT2', tipo: 'calco', imagen: 'calco-globo.png', color: BLANCO },
-    { archivos: DECALS, textura: '{BLOODHAND6', tipo: 'calco', imagen: 'calco-palabra.png', color: NEGRO },
-    { archivos: DECALS, textura: '{FOOT_L', tipo: 'calco', imagen: 'calco-sla.png', color: VERDE },
-    { archivos: DECALS, textura: '{FOOT_R', tipo: 'calco', imagen: 'calco-globo.png', color: VERDE },
+    { archivos: DECALS, textura: '{BLOODHAND6', tipo: 'calco', imagen: 'calco-sla.png', color: VERDE },
+    { archivos: DECALS, textura: '{FOOT_L', tipo: 'calco', imagen: 'calco-globo.png', color: VERDE },
+    { archivos: DECALS, textura: '{FOOT_R', tipo: 'calco', imagen: 'calco-globo.png', color: NEGRO },
 ];
 
 // ------------------------------------------------------------------ .wad
@@ -115,47 +119,63 @@ export function reemplazar(bytes, cambios) {
 }
 
 // ---------------------------------------------------------------- colores
-// Reduce una imagen a 256 colores (corte por la mediana)
+// Reduce una imagen a 256 colores (corte por la mediana, sobre un histograma de 32 niveles
+// por canal: rápido aunque la textura sea grande; los colores salen del promedio exacto)
 export function cuantizar(rgb) {
     const n = rgb.length / 3;
-    let cajas = [Int32Array.from({ length: n }, (_, i) => i)];
-    const rango = (caja) => {
+    const cuenta = new Uint32Array(32768);
+    const suma = new Float64Array(32768 * 3);
+    for (let i = 0; i < n; i++) {
+        const r = rgb[i * 3];
+        const g = rgb[i * 3 + 1];
+        const b = rgb[i * 3 + 2];
+        const k = ((r >> 3) << 10) | ((g >> 3) << 5) | (b >> 3);
+        cuenta[k]++;
+        suma[k * 3] += r;
+        suma[k * 3 + 1] += g;
+        suma[k * 3 + 2] += b;
+    }
+    const usados = [];
+    for (let k = 0; k < 32768; k++) if (cuenta[k]) usados.push(k);
+    const nivel = (k, c) => (c === 0 ? k >> 10 : c === 1 ? (k >> 5) & 31 : k & 31);
+    const medir = (caja) => {
+        let total = 0;
         let mejor = -1;
         let canal = 0;
+        for (const k of caja) total += cuenta[k];
         for (let c = 0; c < 3; c++) {
-            let min = 255;
+            let min = 31;
             let max = 0;
-            for (const i of caja) {
-                const x = rgb[i * 3 + c];
-                if (x < min) min = x;
-                if (x > max) max = x;
-            }
+            for (const k of caja) { const x = nivel(k, c); if (x < min) min = x; if (x > max) max = x; }
             if (max - min > mejor) { mejor = max - min; canal = c; }
         }
-        return { mejor, canal };
+        return { puntaje: mejor * Math.sqrt(total), canal, total };
     };
+    let cajas = [{ bins: Int32Array.from(usados), ...medir(usados) }];
     while (cajas.length < 256) {
         let elegida = -1;
-        let puntaje = 0;
-        let canal = 0;
-        cajas.forEach((caja, k) => {
-            if (caja.length < 2) return;
-            const r = rango(caja);
-            const p = r.mejor * Math.sqrt(caja.length);
-            if (p > puntaje) { puntaje = p; elegida = k; canal = r.canal; }
-        });
+        for (let i = 0; i < cajas.length; i++) {
+            if (cajas[i].bins.length > 1 && (elegida < 0 || cajas[i].puntaje > cajas[elegida].puntaje)) elegida = i;
+        }
         if (elegida < 0) break;
-        const caja = cajas[elegida].slice().sort((a, b) => rgb[a * 3 + canal] - rgb[b * 3 + canal]);
-        const medio = caja.length >> 1;
-        cajas.splice(elegida, 1, caja.subarray(0, medio), caja.subarray(medio));
+        const { bins, canal, total } = cajas[elegida];
+        const orden = bins.slice().sort((a, b) => nivel(a, canal) - nivel(b, canal));
+        let acum = 0;
+        let corte = 1;
+        for (; corte < orden.length - 1; corte++) {
+            acum += cuenta[orden[corte - 1]];
+            if (acum * 2 >= total) break;
+        }
+        const a = orden.subarray(0, corte);
+        const b = orden.subarray(corte);
+        cajas.splice(elegida, 1, { bins: a, ...medir(a) }, { bins: b, ...medir(b) });
     }
     const paleta = new Uint8Array(768);
-    cajas.forEach((caja, k) => {
-        for (let c = 0; c < 3; c++) {
-            let s = 0;
-            for (const i of caja) s += rgb[i * 3 + c];
-            paleta[k * 3 + c] = Math.round(s / Math.max(1, caja.length));
-        }
+    cajas.forEach((caja, j) => {
+        let t = 0;
+        const s = [0, 0, 0];
+        for (const k of caja.bins) { t += cuenta[k]; for (let c = 0; c < 3; c++) s[c] += suma[k * 3 + c]; }
+        for (let c = 0; c < 3; c++) paleta[j * 3 + c] = Math.round(s[c] / Math.max(1, t));
     });
     return paleta;
 }

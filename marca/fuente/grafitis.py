@@ -4,10 +4,12 @@ Uso (desde la carpeta del proyecto, con numpy, cairosvg y pillow instalados):
     python3 marca/fuente/grafitis.py
 
 Deja en marca/web/grafitis/:
-  pared-sla.png     «SLA» en aerosol para las paredes de piedra (128 × 240)
-  ventana-logo.png  el globo de SLA debajo de las ventanas (128 × 240)
-  caja-logo.png     el logo en esténcil blanco para los cajones grandes (128 × 128)
-  calco-*.png       máscaras de un solo color para los aerosoles que tiran los bots
+  pared-globo.png       el globo de SLA en aerosol para las paredes de piedra (128 × 240)
+  ventana-logo.png      el globo debajo de las ventanas (128 × 240)
+  caja-globo.png        el globo en esténcil para los cajones grandes (128 × 128)
+  caja-chica-globo.png  lo mismo para los cajones chicos (64 × 64)
+  caja-militar-sla.png  «SLA» en esténcil para los cajones militares (64 × 64)
+  calco-*.png           máscaras de un solo color para los aerosoles que tiran los bots
 
 Son capas con transparencia, hechas solo con el logo de SLA: la página las pinta encima
 de las texturas del juego de cada jugador cuando arranca (nada del juego se copia acá).
@@ -126,24 +128,39 @@ def grafiti_con_borde(forma: np.ndarray, rng, relleno=VERDE, borde=TINTA, grosor
     return lienzo
 
 
-def pared_sla(rng) -> Image.Image:
-    letras = mascara(LOGO, 104, CORTE_LETRAS)
-    forma = ubicar(letras, (128, 240), (64, 126), angulo=7)
-    return grafiti_con_borde(forma, rng, chorros=9, largo=(6, 22))
+def pared_globo(rng) -> Image.Image:
+    """El globo en aerosol para las paredes de piedra. Es simétrico a propósito: el juego
+    muestra las texturas espejadas en más o menos la mitad de las paredes, y un texto ahí
+    saldría al revés; el globo se ve igual de los dos lados."""
+    globo = mascara(GLOBO, 74)
+    forma = ubicar(globo, (128, 240), (64, 120))
+    return grafiti_con_borde(forma, rng, grosor=2, chorros=8, largo=(6, 22))
 
 
 def ventana_logo(rng) -> Image.Image:
-    globo = mascara(GLOBO, 64)
-    forma = ubicar(globo, (128, 240), (66, 160), angulo=-4)
-    return grafiti_con_borde(forma, rng, grosor=2, chorros=5, largo=(5, 18))
+    globo = mascara(GLOBO, 60)
+    forma = ubicar(globo, (128, 240), (64, 162))
+    return grafiti_con_borde(forma, rng, relleno=(238, 238, 232), grosor=2, chorros=5, largo=(5, 18))
 
 
-def caja_logo(rng) -> Image.Image:
-    """Esténcil: el logo completo en blanco gastado, como pintado sobre la madera."""
-    logo = mascara(LOGO, 108)
-    forma = ubicar(logo, (128, 128), (64, 66))
+def estencil(forma: np.ndarray, rng, rgb=(236, 230, 210), fuerza=0.9) -> Image.Image:
+    """Pintura con plantilla, gastada, como sobre la madera de un cajón."""
     gastado = np.clip(forma * (0.55 + 0.45 * difuminar(rng.random(forma.shape).astype(np.float32), 1.6) * 1.6), 0, 1)
-    return color(aerosol(gastado, rng, halo=0.12, gotas=0.08, chorros=0) * 0.9, (236, 230, 210))
+    return color(aerosol(gastado, rng, halo=0.12, gotas=0.08, chorros=0) * fuerza, rgb)
+
+
+def caja_globo(rng) -> Image.Image:
+    return estencil(ubicar(mascara(GLOBO, 78), (128, 128), (64, 64)), rng)
+
+
+def caja_chica_globo(rng) -> Image.Image:
+    return estencil(ubicar(mascara(GLOBO, 40), (64, 64), (32, 32)), rng)
+
+
+def caja_militar_sla(rng) -> Image.Image:
+    """«SLA» en esténcil para los cajones militares de de_dust2 (ahí se ven siempre al derecho)."""
+    letras = mascara(LOGO, 54, CORTE_LETRAS)
+    return estencil(ubicar(letras, (64, 64), (32, 34)), rng, rgb=(22, 22, 18), fuerza=0.9)   # el cajón es claro: va en negro
 
 
 def calcos(rng) -> dict[str, Image.Image]:
@@ -152,9 +169,9 @@ def calcos(rng) -> dict[str, Image.Image]:
     letras = mascara(LOGO, 104, CORTE_LETRAS)
     globo = mascara(GLOBO, 84)
     return {
-        'calco-palabra.png': a_imagen(aerosol(ubicar(palabra, (128, 48), (64, 22)), rng, chorros=5, largo=(3, 9))),
-        'calco-sla.png': a_imagen(aerosol(ubicar(letras, (128, 64), (64, 28), angulo=6), rng, chorros=7, largo=(4, 12))),
-        'calco-globo.png': a_imagen(aerosol(ubicar(globo, (96, 96), (48, 46)), rng, chorros=5, largo=(4, 12))),
+        'calco-palabra.png': a_imagen(aerosol(ubicar(palabra, (128, 48), (64, 22)), rng, gotas=0.06, chorros=5, largo=(3, 9))),
+        'calco-sla.png': a_imagen(aerosol(ubicar(letras, (128, 64), (64, 28), angulo=6), rng, gotas=0.06, chorros=7, largo=(4, 12))),
+        'calco-globo.png': a_imagen(aerosol(ubicar(globo, (96, 96), (48, 46)), rng, gotas=0.06, chorros=5, largo=(4, 12))),
     }
 
 
@@ -162,9 +179,11 @@ def main() -> None:
     SALIDA.mkdir(parents=True, exist_ok=True)
     rng = np.random.default_rng(1203)
     hechos = {
-        'pared-sla.png': pared_sla(rng),
+        'pared-globo.png': pared_globo(rng),
         'ventana-logo.png': ventana_logo(rng),
-        'caja-logo.png': caja_logo(rng),
+        'caja-globo.png': caja_globo(rng),
+        'caja-chica-globo.png': caja_chica_globo(rng),
+        'caja-militar-sla.png': caja_militar_sla(rng),
         **calcos(rng),
     }
     for nombre, im in hechos.items():
