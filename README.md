@@ -50,6 +50,9 @@ los archivos del juego (~600 MB) y prepara todo. Después arranca en un minuto.
 - No hay flechita del mouse: hacés clic, el navegador «atrapa» el mouse y apuntás con la
   mira. **Esc** lo suelta.
 - **⌥ Option + H** (Alt + H): cambiar entre la mano y el mouse cuando quieras.
+- En pantallas Retina y celulares los textos (nombres, quién mató a quién, chat, menús) y
+  el resto del HUD se agrandan solos (al doble en una Mac con Retina). Para elegir otro tamaño, agregá `?hud=1.5`
+  a la dirección (de 1 a 3; `?hud=1` lo deja como en la versión original).
 
 ## Jugar con la mano
 
@@ -119,7 +122,7 @@ jugadores. Ver [mapas/LEEME.md](mapas/LEEME.md).
 |---|---|
 | `servidor/` | Las salas: servidores dedicados de CS 1.6 ([Xash3D FWGS](https://github.com/FWGS/xash3d-fwgs) + [ReGameDLL_CS](https://github.com/rehlds/ReGameDLL_CS) + bots [YaPB](https://github.com/yapb/yapb)). Linux 32 bits. |
 | `web/` | Node: la página (motor en WebAssembly, de [CSweb](https://github.com/santiagoPostacchini/CSweb)), estado de las salas, paquetes del juego y puente WebRTC ⇄ UDP. |
-| `web/cliente/` | Lo propio de la página: salas, equipo, archivos propios y control con la mano. |
+| `web/cliente/` | Lo propio de la página: salas, equipo, archivos propios, celular, textos grandes y control con la mano. |
 | `studio/` | Estudio de personajes (Python): texturas de los `.mdl`, arma `valve.zip` y `mod.zip`. |
 | `marca/` | Marca SLA (página y juego). |
 | `mapas/` | Mapas y archivos de la comunidad. |
