@@ -249,6 +249,31 @@ body.playing.cs16-tactil-on .cs16-tactil { display: flex; }
     }
 }
 
+/* radio.js: menús de radio (Z, X, C), a la izquierda como los menús del juego */
+.cs16-radio {
+    position: fixed;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 4;
+    min-width: 230px;
+    padding: 12px 16px 10px;
+    border-radius: 10px;
+    background: #000000a8;
+    border: 1px solid #ffffff24;
+    color: #fff;
+    font: 500 15px/1.5 "Geist", system-ui, sans-serif;
+    pointer-events: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+.cs16-radio[hidden], body:not(.playing) .cs16-radio { display: none; }
+.cs16-radio-titulo { margin: 0 0 6px; color: #ffb428; font-weight: 700; }
+.cs16-radio-titulo kbd { margin-left: 4px; font: 600 11px/1 "Geist Mono", ui-monospace, monospace; opacity: .7; }
+.cs16-radio ol { margin: 0; padding: 0; list-style: none; }
+.cs16-radio b { display: inline-block; width: 1.4em; color: #ffb428; }
+.cs16-radio-salir { margin: 6px 0 0; color: #ffffffb3; }
+
 /* sesion.js: se cortó la conexión con la sala */
 .cs16-corte {
     position: fixed;

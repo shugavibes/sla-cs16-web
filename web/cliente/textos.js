@@ -65,5 +65,6 @@ export function agrandarTextos({ ventana = globalThis, elegida = null } = {}) {
         // ventana más grande o más chica, zoom del navegador, celular girado
         ventana.addEventListener?.('resize', () => { if (ventana.xash?.running) mandar(); });
     }, 100);   // entre que aparece el motor y el «connect» pasan segundos (carga de archivos)
+    revisar.unref?.();
     return true;
 }

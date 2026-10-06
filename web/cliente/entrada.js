@@ -10,6 +10,8 @@ import { entrarAlEquipo } from './equipo.js';
 import * as tactil from './tactil.js';
 import { vigilar } from './sesion.js';
 import { agrandarTextos } from './textos.js';
+import { activarRadio } from './radio.js';
+import { activarTeclas } from './teclas.js';
 
 const $ = (id) => document.getElementById(id);
 const form = $('form');
@@ -270,6 +272,17 @@ function armarColumnas() {
     if (ayuda && matchMedia('(min-width: 860px)').matches) ayuda.open = true;
     // la consola es la tecla de al lado del 1 (en teclados en español, «º»)
     for (const k of ayuda?.querySelectorAll('kbd') || []) if (k.textContent === '`') k.textContent = 'º';
+    // agacharse y radio (teclas.js, radio.js)
+    const lista = ayuda?.querySelector('ul');
+    if (lista && !lista.querySelector('.cs16-ayuda-extra')) {
+        for (const li of lista.querySelectorAll('li')) {
+            if (/agacharse/.test(li.textContent)) {
+                li.innerHTML = '<kbd>W A S D</kbd> moverse · <kbd>Espacio</kbd> saltar · <kbd>Ctrl</kbd> o <kbd>Alt</kbd> agacharse · <kbd>Shift</kbd> despacio';
+            }
+        }
+        lista.insertAdjacentHTML('beforeend',
+            '<li class="cs16-ayuda-extra"><kbd>Z</kbd> <kbd>X</kbd> <kbd>C</kbd> radio (elegís con los números)</li>');
+    }
 }
 
 // ----------------------------------------------------------------- arranque
@@ -295,6 +308,8 @@ if (form && jugar && lobby && !document.querySelector('.cs16-equipo')) {
 
     vigilar();   // si se corta la conexión con la sala, cartel con «Volver a entrar»
     agrandarTextos({ elegida: params.get('hud') });   // nombres, muertes y chat legibles en Retina y celulares
+    activarRadio();                                    // menús de radio visibles con Z, X y C
+    activarTeclas({ avisar: (t) => avisoBreve(t, 9000) });   // Alt también agacha (Ctrl+W cierra la pestaña)
 
     let entrando = false;
     form.addEventListener('submit', () => {
