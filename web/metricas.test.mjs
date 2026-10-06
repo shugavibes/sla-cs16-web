@@ -98,3 +98,14 @@ test('la página escapa los nombres y muestra quién juega ahora', () => {
     assert.match(html, /<b>1<\/b><span>jugando ahora/);
     assert.match(paginaClave({ error: true }), /Esa clave no es/);
 });
+
+test('las partidas recuperadas (sin nombre) cuentan, y «Jugaron» queda en «—»', () => {
+    const e = (h, ev) => ({ t: BASE + h * HORA, recuperado: true, ...ev });
+    const r = resumir([e(-1, { tipo: 'entra', j: 9, sala: '1' }), e(-0.5, { tipo: 'sale', j: 9, sala: '1', s: 1800 })],
+        { zona: ZONA, ahora: BASE, dias: 2 });
+    assert.equal(r.hoy.partidas, 1);
+    assert.equal(r.hoy.jugadores, 0);
+    assert.equal(r.hoy.sinNombre, 1);
+    const html = paginaEstadisticas({ resumen: r, zona: ZONA, ahora: BASE });
+    assert.match(html, /<b>—<\/b><span>jugaron/);
+});

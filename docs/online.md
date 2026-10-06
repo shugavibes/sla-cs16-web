@@ -130,6 +130,7 @@ git pull && ./start.sh online                # actualizar a la última versión
 bash cerrar.sh "Volvemos mañana a las 20 h"  # cerrar: cartel en la página y salas apagadas
 bash abrir.sh                                # abrir de nuevo
 bash estadisticas.sh                         # link a las estadísticas: cuánta gente entra y quién jugó
+bash recuperar-historial.sh                  # (una vez) suma las partidas de antes, desde el registro de la web
 ```
 
 - **Agregar salas:** editá `config/salas.conf` y corré `./start.sh online`.

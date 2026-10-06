@@ -93,7 +93,7 @@ export function diaDe(t, zona) {
 export function resumir(eventos, { zona = 'America/Argentina/Buenos_Aires', ahora = Date.now(), dias = 14 } = {}) {
     const claves = [...new Set(Array.from({ length: dias + 1 }, (_, i) => diaDe(ahora - i * DIA_MS, zona)))].slice(0, dias);
     const porDia = new Map(claves.map((dia) => [dia, {
-        dia, visitas: 0, visitantes: new Set(), partidas: 0, jugadores: new Set(), segundos: 0, pico: 0,
+        dia, visitas: 0, visitantes: new Set(), partidas: 0, jugadores: new Set(), sinNombre: 0, segundos: 0, pico: 0,
     }]));
     const ultimas = [];
     let dentro = 0;
@@ -107,6 +107,7 @@ export function resumir(eventos, { zona = 'America/Argentina/Buenos_Aires', ahor
         if (e.tipo === 'entra') {
             d.partidas++;
             if (e.nombre) d.jugadores.add(String(e.nombre).toLowerCase());
+            else d.sinNombre++;   // recuperadas del registro de antes (sin nombres)
             d.pico = Math.max(d.pico, dentro);
         }
         if (e.tipo === 'sale') d.segundos += Number(e.s) || 0;
@@ -119,7 +120,7 @@ export function resumir(eventos, { zona = 'America/Argentina/Buenos_Aires', ahor
         d.jugadores.forEach((v) => jugadores.add(v));
         return {
             dia: d.dia, visitas: d.visitas, visitantes: d.visitantes.size, partidas: d.partidas,
-            jugadores: d.jugadores.size, minutos: Math.round(d.segundos / 60), pico: d.pico,
+            jugadores: d.jugadores.size, sinNombre: d.sinNombre, minutos: Math.round(d.segundos / 60), pico: d.pico,
         };
     });
     return {
@@ -215,7 +216,8 @@ export function paginaEstadisticas({ resumen, enLinea = [], salas = [], nombre =
             `${esc(p.nombre || 'entrando…')}${p.desde ? ` <span class="sub">(${duracion((ahora - p.desde) / 1000)})</span>` : ''}`).join(', ')}</p>`).join('')
         : '<p class="sub">Nadie jugando en este momento.</p>';
 
-    const filas = resumen.dias.map((d) => `<tr><td>${esc(fecha(d.dia))}</td><td>${d.visitantes}</td><td>${d.jugadores}</td>
+    const jugaron = (d) => (d.jugadores || !d.sinNombre ? d.jugadores : '—');
+    const filas = resumen.dias.map((d) => `<tr><td>${esc(fecha(d.dia))}</td><td>${d.visitantes}</td><td>${jugaron(d)}</td>
 <td>${d.partidas}</td><td>${d.pico}</td><td>${d.minutos ? duracion(d.minutos * 60) : '—'}</td>
 <td class="barra"><i style="width:${Math.round((d.visitantes / maxV) * 100)}%"></i></td></tr>`).join('');
 
@@ -233,7 +235,7 @@ export function paginaEstadisticas({ resumen, enLinea = [], salas = [], nombre =
 <h2>Hoy</h2>
 <div class="cifras">
 <div class="cifra"><b>${h.visitantes}</b><span>personas abrieron la página</span></div>
-<div class="cifra"><b>${h.jugadores}</b><span>jugaron</span></div>
+<div class="cifra"><b>${jugaron(h)}</b><span>jugaron</span></div>
 <div class="cifra"><b>${h.partidas}</b><span>partidas</span></div>
 <div class="cifra"><b>${h.pico}</b><span>jugando a la vez (máximo)</span></div>
 <div class="cifra"><b>${h.minutos ? duracion(h.minutos * 60) : '—'}</b><span>tiempo jugado</span></div>
@@ -252,5 +254,5 @@ export function paginaEstadisticas({ resumen, enLinea = [], salas = [], nombre =
 <div class="tabla"><table><thead><tr><th>Salió</th><th>Jugador</th><th>Sala</th><th>Duró</th></tr></thead><tbody>${ultimas}</tbody></table></div>
 
 <p class="nota">«Personas» son navegadores distintos que abrieron la página (cada uno guarda un número al azar; no se guardan IPs).
-«Jugaron» cuenta nombres distintos que entraron a una sala. Las cifras empiezan a contar desde que se instaló esta versión.</p>`, { refrescar: true });
+«Jugaron» cuenta nombres distintos que entraron a una sala. Lo de antes de las estadísticas (bash recuperar-historial.sh) sale del registro de la web: partidas y horarios, sin nombres ni visitas.</p>`, { refrescar: true });
 }
