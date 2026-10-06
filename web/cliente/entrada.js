@@ -12,6 +12,7 @@ import { vigilar } from './sesion.js';
 import { agrandarTextos } from './textos.js';
 import { activarRadio } from './radio.js';
 import { activarTeclas } from './teclas.js';
+import { prepararGrafitis } from './grafitis.js';
 
 const $ = (id) => document.getElementById(id);
 const form = $('form');
@@ -26,8 +27,10 @@ const guardar = (k, v) => {
 };
 const escapar = (t) => String(t).replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
 
-// La función del cliente que carga los archivos pasa por acá (ver archivos.js)
-archivos.instalarEnganche(() => window.cs16Estado, () => $('password')?.value || '');
+// La función del cliente que carga los archivos pasa por acá (ver archivos.js); al
+// cargarlos se pintan los grafitis de SLA en los mapas (grafitis.js). ?grafitis=0 los saca.
+archivos.instalarEnganche(() => window.cs16Estado, () => $('password')?.value || '',
+    params.get('grafitis') === '0' ? null : prepararGrafitis);
 
 function insertarAntesDeJugar(...nodos) {
     for (const n of nodos) form.insertBefore(n, jugar);

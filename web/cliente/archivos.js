@@ -174,9 +174,14 @@ async function revisarClave(url) {
     if (r.status === 429) throw new Error('Demasiados intentos con la contraseña. Esperá unos minutos y probá de nuevo.');
 }
 
-export function instalarEnganche(estadoServidor, clave = () => '') {
-    window.cs16CargarArchivos = async (url, version, tamano, sink, progreso, cargarZip) => {
+// prepararArchivos(): devuelve una función (ruta, bytes) -> bytes que retoca archivos al
+// cargarlos (los grafitis de SLA, ver grafitis.js); si falla, se carga todo tal cual.
+export function instalarEnganche(estadoServidor, clave = () => '', prepararArchivos = null) {
+    window.cs16CargarArchivos = async (url, version, tamano, sinkOriginal, progreso, cargarZip) => {
         url = directo(url);
+        let retocar = null;
+        try { retocar = prepararArchivos ? await prepararArchivos() : null; } catch (e) { console.warn('[archivos]', e); }
+        const sink = retocar ? (ruta, datos) => sinkOriginal(ruta, retocar(ruta, datos)) : sinkOriginal;
         const assets = estadoServidor()?.assets;
         if (!assets?.propios) {
             const c = clave();

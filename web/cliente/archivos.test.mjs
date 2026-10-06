@@ -43,3 +43,23 @@ test('con la página en otra dirección, los paquetes se bajan del servidor del 
     assert.equal(directo('/game/valve.zip', 'https://1-2-3-4.sslip.io', 'https://1-2-3-4.sslip.io'), '/game/valve.zip');
     assert.equal(directo('/game/mod.zip', undefined, 'http://localhost:27016'), '/game/mod.zip');
 });
+
+test('al cargar, cada archivo pasa por el retoque (grafitis) y si el retoque falla se carga igual', async () => {
+    const { instalarEnganche } = await import('./archivos.js');
+    globalThis.window = globalThis.window || {};
+    globalThis.fetch = async () => ({ status: 200 });
+    const escritos = [];
+    const sink = (ruta, datos) => escritos.push([ruta, [...datos]]);
+    const cargarZip = async (url, v, t, s) => { s('cstrike/cs_dust.wad', Uint8Array.of(1)); s('cstrike/otro.txt', Uint8Array.of(2)); };
+    instalarEnganche(() => ({ assets: {} }), () => '', async () => (ruta, d) => (ruta.endsWith('.wad') ? Uint8Array.of(9) : d));
+    await window.cs16CargarArchivos('/game/valve.zip', 1, 1, sink, () => {}, cargarZip);
+    assert.deepEqual(escritos, [['cstrike/cs_dust.wad', [9]], ['cstrike/otro.txt', [2]]]);
+
+    escritos.length = 0;
+    const avisar = console.warn;
+    console.warn = () => {};
+    instalarEnganche(() => ({ assets: {} }), () => '', async () => { throw new Error('sin imágenes'); });
+    await window.cs16CargarArchivos('/game/valve.zip', 1, 1, sink, () => {}, cargarZip);
+    console.warn = avisar;
+    assert.deepEqual(escritos, [['cstrike/cs_dust.wad', [1]], ['cstrike/otro.txt', [2]]]);
+});
