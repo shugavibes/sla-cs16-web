@@ -9,6 +9,7 @@ import * as archivos from './archivos.js';
 import { entrarAlEquipo } from './equipo.js';
 import * as tactil from './tactil.js';
 import { vigilar } from './sesion.js';
+import { agrandarTextos } from './textos.js';
 
 const $ = (id) => document.getElementById(id);
 const form = $('form');
@@ -293,6 +294,7 @@ if (form && jugar && lobby && !document.querySelector('.cs16-equipo')) {
     setInterval(() => { if (!lobby.hidden) actualizarSalas(cajaSalas); }, 5000);
 
     vigilar();   // si se corta la conexión con la sala, cartel con «Volver a entrar»
+    agrandarTextos({ elegida: params.get('hud') });   // nombres, muertes y chat legibles en Retina y celulares
 
     let entrando = false;
     form.addEventListener('submit', () => {
