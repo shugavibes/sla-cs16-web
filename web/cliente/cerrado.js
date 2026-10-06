@@ -1,6 +1,6 @@
 // «Cerrado por ahora»: si en el servidor existe marca/web/cerrado.txt (lo crea ./cerrar.sh),
-// la página muestra ese mensaje en vez de la entrada y nadie puede tocar «Jugar». Cuando
-// se borra (./abrir.sh), la página se recarga sola y vuelve a la normalidad.
+// la página muestra ese mensaje (grande, con el logo) en vez de la entrada y nadie puede
+// tocar «Jugar». Cuando se borra (./abrir.sh), la página se recarga sola y vuelve a la normalidad.
 
 const ARCHIVO = '/marca/cerrado.txt';
 const REVISAR_MS = 30000;
@@ -24,10 +24,10 @@ function mostrar(mensaje) {
         caja.className = 'cs16-cerrado';
         caja.setAttribute('role', 'alert');
         caja.innerHTML = '<div class="cs16-cerrado-caja"><img src="/marca/sla-logo.svg" alt="SLA">' +
-            '<h1>Cerrado por ahora</h1><p></p><small>Esta página se abre sola cuando volvamos.</small></div>';
+            '<h1></h1><small>Esta página se abre sola cuando volvamos.</small></div>';
         document.body.append(caja);
     }
-    caja.querySelector('p').textContent = mensaje;
+    caja.querySelector('h1').textContent = mensaje;
     document.body.classList.add('cs16-esta-cerrado');
     const jugar = document.getElementById('play');
     if (jugar) {
