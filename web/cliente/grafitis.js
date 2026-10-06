@@ -2,11 +2,12 @@
 //
 // Cuando el juego carga sus archivos (los del servidor o los propios de cada jugador),
 // esta página pinta los grafitis de marca/web/grafitis/ encima de algunas texturas:
-//   - de_dust y de_dust2: el globo de SLA en aerosol en una de las dos piedras de pared que
-//     el juego reparte al azar (sale en más o menos la mitad de las paredes) y debajo de las
-//     ventanas, el globo en esténcil en los cajones y «SLA» en los cajones militares.
+//   - de_dust y de_dust2: el logo de SLA en aerosol en una de las dos piedras de pared que
+//     el juego reparte al azar (sale en más o menos la mitad de las paredes), el logo en
+//     esténcil en los cajones grandes y militares, y el timbre pegado debajo de las
+//     ventanas, en las puertas grandes y en los cajones chicos.
 //   - Todos los mapas: los aerosoles que tiran los bots (logos.cfg de YaPB) pasan a ser el
-//     logo, la palabra y el globo de SLA, en verde, negro y blanco.
+//     logo de SLA (a color, verde, negro o blanco) y el timbre.
 // Solo se cambian texturas que vienen en archivos .wad aparte del mapa: el mapa queda igual
 // y el servidor no nota ninguna diferencia. Los archivos guardados no se tocan: se pinta
 // cada vez al cargar, en la memoria del juego. Si algo no coincide (otra versión del .wad),
@@ -19,25 +20,26 @@ const BLANCO = [236, 236, 230];
 const DECALS = ['cstrike/decals.wad', 'valve/decals.wad'];
 
 export const PARCHES = [
-    // El globo es simétrico: el juego muestra las texturas espejadas en la mitad de las
-    // paredes y un texto saldría al revés. Las letras van donde se ven al derecho.
-    { archivos: ['cstrike/cs_dust.wad'], textura: '-1CSSANDWALL', tipo: 'pared', imagen: 'pared-globo.png' },
-    { archivos: ['cstrike/cs_dust.wad'], textura: 'SANDWLLWNDW', tipo: 'pared', imagen: 'ventana-logo.png' },
-    { archivos: ['cstrike/cs_dust.wad'], textura: 'SANDCRTLRGSD', tipo: 'pared', imagen: 'caja-globo.png' },
-    { archivos: ['cstrike/cs_dust.wad'], textura: 'SANDCRTSMSD', tipo: 'pared', imagen: 'caja-chica-globo.png' },
-    { archivos: ['cstrike/cs_dust.wad'], textura: 'MLTRYCRTESD', tipo: 'pared', imagen: 'caja-militar-sla.png' },
-    // aerosoles de los bots: un solo color (el juego usa la imagen como transparencia)
-    { archivos: DECALS, textura: '{GRAF003', tipo: 'calco', imagen: 'calco-palabra.png', color: VERDE },
-    { archivos: DECALS, textura: '{GRAF004', tipo: 'calco', imagen: 'calco-sla.png', color: NEGRO },
-    { archivos: DECALS, textura: '{GRAF005', tipo: 'calco', imagen: 'calco-globo.png', color: VERDE },
-    { archivos: DECALS, textura: '{BIOHAZ', tipo: 'calco', imagen: 'calco-globo.png', color: VERDE },
-    { archivos: DECALS, textura: '{LAMBDA06', tipo: 'calco', imagen: 'calco-globo.png', color: NEGRO },
-    { archivos: DECALS, textura: '{TARGET', tipo: 'calco', imagen: 'calco-palabra.png', color: BLANCO },
-    { archivos: DECALS, textura: '{HAND1', tipo: 'calco', imagen: 'calco-globo.png', color: BLANCO },
-    { archivos: DECALS, textura: '{SPIT2', tipo: 'calco', imagen: 'calco-globo.png', color: BLANCO },
+    // Ojo: el juego muestra las texturas espejadas en más o menos la mitad de las paredes
+    // (así funciona CS 1.6): ahí el logo se lee al revés. El timbre es simétrico.
+    { archivos: ['cstrike/cs_dust.wad'], textura: '-1CSSANDWALL', tipo: 'pared', imagen: 'pared-logo.png' },
+    { archivos: ['cstrike/cs_dust.wad'], textura: 'SANDWLLWNDW', tipo: 'pared', imagen: 'ventana-timbre.png' },
+    { archivos: ['cstrike/cs_dust.wad'], textura: 'SANDWLLDOOR', tipo: 'pared', imagen: 'puerta-timbre.png' },
+    { archivos: ['cstrike/cs_dust.wad'], textura: 'SANDCRTLRGSD', tipo: 'pared', imagen: 'caja-logo.png' },
+    { archivos: ['cstrike/cs_dust.wad'], textura: 'SANDCRTSMSD', tipo: 'pared', imagen: 'caja-chica-timbre.png' },
+    { archivos: ['cstrike/cs_dust.wad'], textura: 'MLTRYCRTESD', tipo: 'pared', imagen: 'caja-militar-logo.png' },
+    // aerosoles de los bots: a todo color (logo y timbre) o de un color con bordes suaves
+    { archivos: DECALS, textura: '{GRAF003', tipo: 'calco-color', imagen: 'calco-logo-color.png' },
+    { archivos: DECALS, textura: '{GRAF004', tipo: 'calco', imagen: 'calco-logo.png', color: NEGRO },
+    { archivos: DECALS, textura: '{GRAF005', tipo: 'calco-color', imagen: 'calco-timbre-color.png' },
+    { archivos: DECALS, textura: '{BIOHAZ', tipo: 'calco-color', imagen: 'calco-logo-color.png' },
+    { archivos: DECALS, textura: '{LAMBDA06', tipo: 'calco', imagen: 'calco-logo.png', color: BLANCO },
+    { archivos: DECALS, textura: '{TARGET', tipo: 'calco-color', imagen: 'calco-timbre-color.png' },
+    { archivos: DECALS, textura: '{HAND1', tipo: 'calco', imagen: 'calco-logo.png', color: VERDE },
+    { archivos: DECALS, textura: '{SPIT2', tipo: 'calco-color', imagen: 'calco-logo-color.png' },
     { archivos: DECALS, textura: '{BLOODHAND6', tipo: 'calco', imagen: 'calco-sla.png', color: VERDE },
-    { archivos: DECALS, textura: '{FOOT_L', tipo: 'calco', imagen: 'calco-globo.png', color: VERDE },
-    { archivos: DECALS, textura: '{FOOT_R', tipo: 'calco', imagen: 'calco-globo.png', color: NEGRO },
+    { archivos: DECALS, textura: '{FOOT_L', tipo: 'calco', imagen: 'calco-logo.png', color: NEGRO },
+    { archivos: DECALS, textura: '{FOOT_R', tipo: 'calco-color', imagen: 'calco-timbre-color.png' },
 ];
 
 // ------------------------------------------------------------------ .wad
@@ -121,7 +123,7 @@ export function reemplazar(bytes, cambios) {
 // ---------------------------------------------------------------- colores
 // Reduce una imagen a 256 colores (corte por la mediana, sobre un histograma de 32 niveles
 // por canal: rápido aunque la textura sea grande; los colores salen del promedio exacto)
-export function cuantizar(rgb) {
+export function cuantizar(rgb, maximo = 256) {
     const n = rgb.length / 3;
     const cuenta = new Uint32Array(32768);
     const suma = new Float64Array(32768 * 3);
@@ -152,7 +154,7 @@ export function cuantizar(rgb) {
         return { puntaje: mejor * Math.sqrt(total), canal, total };
     };
     let cajas = [{ bins: Int32Array.from(usados), ...medir(usados) }];
-    while (cajas.length < 256) {
+    while (cajas.length < maximo) {
         let elegida = -1;
         for (let i = 0; i < cajas.length; i++) {
             if (cajas[i].bins.length > 1 && (elegida < 0 || cajas[i].puntaje > cajas[elegida].puntaje)) elegida = i;
@@ -180,7 +182,7 @@ export function cuantizar(rgb) {
     return paleta;
 }
 
-export function indexar(rgb, paleta) {
+export function indexar(rgb, paleta, colores = 256) {
     const n = rgb.length / 3;
     const out = new Uint8Array(n);
     const memo = new Map();
@@ -192,7 +194,7 @@ export function indexar(rgb, paleta) {
         let k = memo.get(clave);
         if (k === undefined) {
             let mejor = Infinity;
-            for (let j = 0; j < 256; j++) {
+            for (let j = 0; j < colores; j++) {
                 const dr = r - paleta[j * 3];
                 const dg = g - paleta[j * 3 + 1];
                 const db = b - paleta[j * 3 + 2];
@@ -270,6 +272,51 @@ export function texturaCalco(nombre, ancho, alto, alfa, color) {
     return armarMiptex(nombre, ancho, alto, mips, paleta);
 }
 
+// Calcomanía a todo color (el timbre, el logo con su borde): el juego la dibuja opaca o
+// transparente; el índice 255 es el transparente y su color tiene que ser azul puro
+export function texturaCalcoColor(nombre, ancho, alto, rgba) {
+    const opacos = [];
+    for (let i = 0; i < ancho * alto; i++) {
+        if (rgba[i * 4 + 3] >= 128) opacos.push(rgba[i * 4], rgba[i * 4 + 1], rgba[i * 4 + 2]);
+    }
+    const paleta = cuantizar(Uint8Array.from(opacos.length ? opacos : [0, 0, 0]), 255);
+    paleta.set([0, 0, 255], 765);
+    const mips = [];
+    let datos = Uint8Array.from(rgba);
+    let w = ancho;
+    let h = alto;
+    for (let m = 0; m < 4; m++) {
+        const rgb = new Uint8Array(w * h * 3);
+        for (let i = 0; i < w * h; i++) rgb.set(datos.subarray(i * 4, i * 4 + 3), i * 3);
+        const idx = indexar(rgb, paleta, 255);
+        for (let i = 0; i < w * h; i++) if (datos[i * 4 + 3] < 128) idx[i] = 255;
+        mips.push(idx);
+        if (m < 3) { datos = reducirConTransparencia(datos, w, h); w >>= 1; h >>= 1; }
+    }
+    return armarMiptex(nombre, ancho, alto, mips, paleta);
+}
+
+// Mitad de tamaño para una imagen con transparencia de sí o no: cada píxel nuevo es opaco
+// si al menos dos de los cuatro lo eran (con el promedio de esos)
+export function reducirConTransparencia(rgba, ancho, alto) {
+    const a2 = ancho >> 1;
+    const h2 = alto >> 1;
+    const out = new Uint8Array(a2 * h2 * 4);
+    for (let y = 0; y < h2; y++) {
+        for (let x = 0; x < a2; x++) {
+            let n = 0;
+            const s = [0, 0, 0];
+            for (const [dy, dx] of [[0, 0], [0, 1], [1, 0], [1, 1]]) {
+                const i = ((2 * y + dy) * ancho + 2 * x + dx) * 4;
+                if (rgba[i + 3] >= 128) { n++; s[0] += rgba[i]; s[1] += rgba[i + 1]; s[2] += rgba[i + 2]; }
+            }
+            const o = (y * a2 + x) * 4;
+            if (n >= 2) out.set([Math.round(s[0] / n), Math.round(s[1] / n), Math.round(s[2] / n), 255], o);
+        }
+    }
+    return out;
+}
+
 // -------------------------------------------------------------- imágenes
 async function cargarImagen(url) {
     const r = await fetch(url, { cache: 'no-cache' });
@@ -308,6 +355,8 @@ export function armarParcheador(imagenes, parches = PARCHES, aviso = console.war
                     if (p.tipo === 'pared') {
                         if (img.ancho !== tex.ancho || img.alto !== tex.alto) continue;   // otra versión
                         cambios.push({ entrada, datos: texturaPared(tex, img.rgba) });
+                    } else if (p.tipo === 'calco-color') {
+                        cambios.push({ entrada, datos: texturaCalcoColor(tex.nombre, img.ancho, img.alto, img.rgba) });
                     } else {
                         const alfa = new Uint8Array(img.ancho * img.alto);
                         for (let i = 0; i < alfa.length; i++) alfa[i] = img.rgba[i * 4];

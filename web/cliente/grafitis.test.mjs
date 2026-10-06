@@ -125,3 +125,31 @@ test('256 colores: los que hay se conservan', () => {
 test('reduce a la mitad promediando', () => {
     assert.deepEqual([...reducir(Uint8Array.from([0, 100, 200, 100]), 2, 2, 1)], [100]);
 });
+
+test('aerosol a todo color: el índice 255 es el transparente (azul puro en la paleta)', async () => {
+    const { texturaCalcoColor } = await import('./grafitis.js');
+    const rgba = new Uint8Array(16 * 16 * 4);
+    for (let i = 0; i < 256; i++) {
+        const x = i % 16;
+        if (x < 8) rgba.set([250, 210, 20, 255], i * 4);        // mitad amarilla
+        else if (x < 12) rgba.set([10, 10, 10, 255], i * 4);    // un poco de negro
+        // el resto, transparente
+    }
+    const datos = texturaCalcoColor(nombre16('{GRAF005'), 16, 16, rgba);
+    const wad = (() => {
+        // un .wad mínimo con esa textura, para leerla con las mismas funciones
+        const out = new Uint8Array(12 + datos.length + 32);
+        const v = new DataView(out.buffer);
+        out.set([87, 65, 68, 51]); v.setInt32(4, 1, true); v.setInt32(8, 12 + datos.length, true);
+        out.set(datos, 12);
+        v.setInt32(12 + datos.length, 12, true); v.setInt32(16 + datos.length, datos.length, true);
+        out[24 + datos.length] = 0x43; out.set(nombre16('{GRAF005'), 28 + datos.length);
+        return out;
+    })();
+    const t = leerMiptex(wad, leerWad(wad).get('{GRAF005'));
+    assert.deepEqual([...t.paleta.subarray(765)], [0, 0, 255]);
+    assert.equal(t.indices[15], 255, 'transparente');
+    assert.notEqual(t.indices[0], 255);
+    assert.deepEqual([...t.paleta.subarray(t.indices[0] * 3, t.indices[0] * 3 + 3)], [250, 210, 20]);
+    assert.deepEqual([...t.paleta.subarray(t.indices[9] * 3, t.indices[9] * 3 + 3)], [10, 10, 10]);
+});

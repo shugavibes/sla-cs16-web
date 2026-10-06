@@ -4,15 +4,17 @@ Uso (desde la carpeta del proyecto, con numpy, cairosvg y pillow instalados):
     python3 marca/fuente/grafitis.py
 
 Deja en marca/web/grafitis/:
-  pared-globo.png       el globo de SLA en aerosol para las paredes de piedra (128 × 240)
-  ventana-logo.png      el globo debajo de las ventanas (128 × 240)
-  caja-globo.png        el globo en esténcil para los cajones grandes (128 × 128)
-  caja-chica-globo.png  lo mismo para los cajones chicos (64 × 64)
-  caja-militar-sla.png  «SLA» en esténcil para los cajones militares (64 × 64)
-  calco-*.png           máscaras de un solo color para los aerosoles que tiran los bots
+  pared-logo.png          el logo completo en aerosol para las paredes de piedra (128 × 240)
+  ventana-timbre.png      el timbre pegado debajo de las ventanas (128 × 240)
+  puerta-timbre.png       el timbre pegado en las puertas grandes (192 × 160)
+  caja-logo.png           el logo en esténcil para los cajones grandes (128 × 128)
+  caja-chica-timbre.png   el timbre pegado en los cajones chicos (64 × 64)
+  caja-militar-logo.png   el logo en esténcil para los cajones militares (64 × 64)
+  calco-*.png             los aerosoles que tiran los bots
 
-Son capas con transparencia, hechas solo con el logo de SLA: la página las pinta encima
-de las texturas del juego de cada jugador cuando arranca (nada del juego se copia acá).
+Son capas con transparencia, hechas con el logo de SLA y el timbre (marca/fuente/timbre.png):
+la página las pinta encima de las texturas del juego de cada jugador cuando arranca (nada
+del juego se copia acá).
 """
 from __future__ import annotations
 
@@ -128,19 +130,13 @@ def grafiti_con_borde(forma: np.ndarray, rng, relleno=VERDE, borde=TINTA, grosor
     return lienzo
 
 
-def pared_globo(rng) -> Image.Image:
-    """El globo en aerosol para las paredes de piedra. Es simétrico a propósito: el juego
-    muestra las texturas espejadas en más o menos la mitad de las paredes, y un texto ahí
-    saldría al revés; el globo se ve igual de los dos lados."""
-    globo = mascara(GLOBO, 74)
-    forma = ubicar(globo, (128, 240), (64, 120))
-    return grafiti_con_borde(forma, rng, grosor=2, chorros=8, largo=(6, 22))
-
-
-def ventana_logo(rng) -> Image.Image:
-    globo = mascara(GLOBO, 60)
-    forma = ubicar(globo, (128, 240), (64, 162))
-    return grafiti_con_borde(forma, rng, relleno=(238, 238, 232), grosor=2, chorros=5, largo=(5, 18))
+def pared_logo(rng) -> Image.Image:
+    """El logo completo (palabra + globo) en aerosol para las paredes de piedra.
+    Ojo: el juego muestra las texturas espejadas en más o menos la mitad de las paredes,
+    así que ahí el logo se lee al revés (pasa lo mismo con cualquier texto en CS 1.6)."""
+    logo = mascara(LOGO, 112)
+    forma = ubicar(logo, (128, 240), (64, 118), angulo=6)
+    return grafiti_con_borde(forma, rng, grosor=2, chorros=9, largo=(6, 22))
 
 
 def estencil(forma: np.ndarray, rng, rgb=(236, 230, 210), fuerza=0.9) -> Image.Image:
@@ -149,42 +145,96 @@ def estencil(forma: np.ndarray, rng, rgb=(236, 230, 210), fuerza=0.9) -> Image.I
     return color(aerosol(gastado, rng, halo=0.12, gotas=0.08, chorros=0) * fuerza, rgb)
 
 
-def caja_globo(rng) -> Image.Image:
-    return estencil(ubicar(mascara(GLOBO, 78), (128, 128), (64, 64)), rng)
+def caja_logo(rng) -> Image.Image:
+    return estencil(ubicar(mascara(LOGO, 112), (128, 128), (64, 66)), rng)
 
 
-def caja_chica_globo(rng) -> Image.Image:
-    return estencil(ubicar(mascara(GLOBO, 40), (64, 64), (32, 32)), rng)
+def caja_militar_logo(rng) -> Image.Image:
+    """El logo en esténcil negro para los cajones militares (en de_dust2 se ven al derecho)."""
+    return estencil(ubicar(mascara(LOGO, 58), (64, 64), (32, 34)), rng, rgb=(22, 22, 18), fuerza=0.92)
 
 
-def caja_militar_sla(rng) -> Image.Image:
-    """«SLA» en esténcil para los cajones militares de de_dust2 (ahí se ven siempre al derecho)."""
-    letras = mascara(LOGO, 54, CORTE_LETRAS)
-    return estencil(ubicar(letras, (64, 64), (32, 34)), rng, rgb=(22, 22, 18), fuerza=0.9)   # el cajón es claro: va en negro
+# ------------------------------------------------------------------ el timbre
+def timbre() -> np.ndarray:
+    """El timbre (marca/fuente/timbre.png) recortado: sin el fondo blanco, RGBA 0..1."""
+    im = Image.open(RAIZ / 'marca' / 'fuente' / 'timbre.png').convert('RGB')
+    a = np.asarray(im).astype(np.float32)
+    fondo = (np.abs(a - 255).max(axis=2) < 22) | (np.abs(a - (243, 245, 246)).max(axis=2) < 10)
+    # el fondo es lo claro que toca los bordes (así no se come los brillos del timbre)
+    marca = Image.fromarray((fondo * 255).astype(np.uint8), 'L').copy()   # (copia: la de numpy es de solo lectura)
+    alto, ancho = fondo.shape
+    for x, y in [(0, 0), (ancho - 1, 0), (ancho // 2, 0), (0, alto // 2), (ancho - 1, alto // 2), (0, alto - 1), (ancho - 1, alto - 1)]:
+        if marca.getpixel((x, y)) == 255:
+            ImageDraw.floodfill(marca, (x, y), 128)
+    alfa = (np.asarray(marca) != 128).astype(np.float32)
+    alfa = difuminar(de_imagen(a_imagen(alfa).filter(ImageFilter.MinFilter(3))), 0.8)
+    ys, xs = np.where(alfa > 0.5)
+    rgba = np.dstack([a / 255, alfa])[ys.min(): ys.max() + 1, xs.min(): xs.max() + 1]
+    return rgba
 
 
-def calcos(rng) -> dict[str, Image.Image]:
-    """Máscaras para los aerosoles de los bots (decals: el color lo pone el juego)."""
+def achicar(rgba: np.ndarray, ancho: int) -> np.ndarray:
+    alto = round(rgba.shape[0] * ancho / rgba.shape[1])
+    im = Image.fromarray((np.clip(rgba, 0, 1) * 255).astype(np.uint8), 'RGBA')
+    return np.asarray(im.resize((ancho, alto), Image.LANCZOS)).astype(np.float32) / 255
+
+
+def pegatina(rgba: np.ndarray, tam: tuple[int, int], centro: tuple[float, float], ancho: int,
+             angulo: float = 0.0, borde: int = 2) -> Image.Image:
+    """Calcomanía pegada: el timbre con borde blanco y una sombrita."""
+    chico = achicar(rgba, ancho)
+    alfa = chico[..., 3]
+    pad = borde + 3
+    alfa_p = np.pad(alfa, pad)
+    color_p = np.pad(chico[..., :3], ((pad, pad), (pad, pad), (0, 0)))
+    blanco = difuminar(dilatar(alfa_p, borde), 0.6)
+    sombra = difuminar(np.roll(blanco, (2, 2), axis=(0, 1)), 1.5) * 0.45
+    capas = Image.new('RGBA', alfa_p.shape[::-1], (0, 0, 0, 0))
+    capas = encima(capas, color(sombra, (0, 0, 0)))
+    capas = encima(capas, color(blanco, (246, 244, 236)))
+    arte = np.dstack([color_p, alfa_p])
+    capas = encima(capas, Image.fromarray((arte * 255).astype(np.uint8), 'RGBA'))
+    capas = capas.rotate(angulo, resample=Image.BICUBIC, expand=True)
+    lienzo = Image.new('RGBA', tam, (0, 0, 0, 0))
+    lienzo.alpha_composite(capas, (round(centro[0] - capas.width / 2), round(centro[1] - capas.height / 2)))
+    return lienzo
+
+
+def calco_color(rgba: Image.Image) -> Image.Image:
+    """Para los aerosoles de los bots a todo color: el juego solo los dibuja opacos o
+    transparentes (sin medias tintas), así que los bordes se cortan a la mitad."""
+    a = np.asarray(rgba).copy()
+    a[..., 3] = np.where(a[..., 3] >= 128, 255, 0)
+    return Image.fromarray(a, 'RGBA')
+
+
+def calcos(rng, campana: np.ndarray) -> dict[str, Image.Image]:
+    """Aerosoles de los bots. calco-*.png de un color (el color lo pone el juego) y
+    calco-*-color.png a todo color."""
     palabra = mascara(LOGO, 116)
     letras = mascara(LOGO, 104, CORTE_LETRAS)
-    globo = mascara(GLOBO, 84)
+    logo_color = grafiti_con_borde(ubicar(mascara(LOGO, 112), (128, 48), (64, 22)), rng, grosor=2, chorros=0)
+    timbre_color = pegatina(campana, (80, 64), (40, 32), 64, borde=2)
     return {
-        'calco-palabra.png': a_imagen(aerosol(ubicar(palabra, (128, 48), (64, 22)), rng, gotas=0.06, chorros=5, largo=(3, 9))),
+        'calco-logo.png': a_imagen(aerosol(ubicar(palabra, (128, 48), (64, 22)), rng, gotas=0.06, chorros=5, largo=(3, 9))),
         'calco-sla.png': a_imagen(aerosol(ubicar(letras, (128, 64), (64, 28), angulo=6), rng, gotas=0.06, chorros=7, largo=(4, 12))),
-        'calco-globo.png': a_imagen(aerosol(ubicar(globo, (96, 96), (48, 46)), rng, gotas=0.06, chorros=5, largo=(4, 12))),
+        'calco-logo-color.png': calco_color(logo_color),
+        'calco-timbre-color.png': calco_color(timbre_color),
     }
 
 
 def main() -> None:
     SALIDA.mkdir(parents=True, exist_ok=True)
     rng = np.random.default_rng(1203)
+    campana = timbre()
     hechos = {
-        'pared-globo.png': pared_globo(rng),
-        'ventana-logo.png': ventana_logo(rng),
-        'caja-globo.png': caja_globo(rng),
-        'caja-chica-globo.png': caja_chica_globo(rng),
-        'caja-militar-sla.png': caja_militar_sla(rng),
-        **calcos(rng),
+        'pared-logo.png': pared_logo(rng),
+        'ventana-timbre.png': pegatina(campana, (128, 240), (64, 160), 62, angulo=-5),
+        'puerta-timbre.png': pegatina(campana, (192, 160), (146, 98), 36, angulo=4),
+        'caja-logo.png': caja_logo(rng),
+        'caja-chica-timbre.png': pegatina(campana, (64, 64), (32, 33), 44, angulo=-3),
+        'caja-militar-logo.png': caja_militar_logo(rng),
+        **calcos(rng, campana),
     }
     for nombre, im in hechos.items():
         im.save(SALIDA / nombre, optimize=True)
