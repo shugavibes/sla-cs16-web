@@ -1,5 +1,12 @@
 # shellcheck shell=bash
-# Funciones compartidas por start.sh, stop.sh y texturas.sh (bash 3.2, macOS y Linux).
+# Funciones compartidas por start.sh, stop.sh y texturas.sh (bash 3.2, macOS y Linux;
+# en Windows, Git Bash).
+
+# Git Bash en Windows reescribe los argumentos que parecen rutas Unix antes de pasarlos a
+# docker: «+force_install_dir /descarga» le llega al contenedor como
+# «C:/Program Files/Git/descarga» y SteamCMD instala fuera de la carpeta compartida.
+# En macOS y Linux estas variables no hacen nada.
+export MSYS_NO_PATHCONV=1 MSYS2_ARG_CONV_EXCL='*'
 
 # Docker Desktop puede instalar el comando "docker" en lugares que no están en el PATH.
 for _d in /usr/local/bin "${HOME:-/root}/.docker/bin" /Applications/Docker.app/Contents/Resources/bin /opt/homebrew/bin; do
