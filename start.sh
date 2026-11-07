@@ -147,17 +147,21 @@ env_set URL_JUEGO "$URL"
 env_set CONFIAR_PROXY "$PROXY"
 env_set HOST_UID "$(id -u):$(id -g)"
 
-# Salas: si no hay config/salas.conf se arma uno. En modo online, una sola sala sin bots:
-# varias salas con bots a 128 tick se comen la CPU de un VPS chico y los paquetes salen a
-# rachas, que en el juego se ve como tirones (ver docs/pendiente-lag-animaciones.md).
-# 32 es el techo del motor (GoldSrc/Xash3D), no una elección nuestra.
+# Salas: si no hay config/salas.conf se arma uno. En modo online, dos salas de 30 sin
+# bots: 60 lugares en total. Por qué dos y no una de 60: el motor (GoldSrc/Xash3D) topea
+# en 32 jugadores por sala, pida lo que se le pida — con +maxplayers 64 arranca igual con
+# «32 player server started». La contra es que la gente de una sala no juega con la otra.
+# Sin bots porque juegan aunque la sala esté vacía y gastan CPU para nadie.
+# Los mapas tienen que tener lugares donde aparecer para esa cantidad: de_dust2 tiene 40
+# (20 por equipo) y de_inferno 32 (16 por equipo); con 30 jugadores son 15 por equipo.
 if [ ! -s config/salas.conf ]; then
   nombre=$(env_get NOMBRE_SERVIDOR | sed 's/|/·/g')
   {
     sed -n '1,/^# ---/p' config/salas.conf.ejemplo
     printf '# id | nombre | mapa | jugadores | bots | dificultad\n'
     if [ "$MODO" = "online" ]; then
-      printf '1 | %s | de_dust2 | 32 | 0 | 0\n' "$nombre"
+      printf '1 | %s · Dust2   | de_dust2   | 30 | 0 | 0\n' "$nombre"
+      printf '2 | %s · Inferno | de_inferno | 30 | 0 | 0\n' "$nombre"
     else
       printf '1 | %s | %s | %s | %s | %s\n' "$nombre" "$(env_get MAPA)" "$(env_get MAX_JUGADORES)" \
         "$(env_get BOTS)" "$(env_get BOTS_DIFICULTAD)"

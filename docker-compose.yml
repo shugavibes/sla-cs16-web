@@ -61,7 +61,9 @@ services:
       CONTRASENA: "${CONTRASENA:-}"
       ARCHIVOS: "${ARCHIVOS:-servidor}"
       CONFIAR_PROXY: "${CONFIAR_PROXY:-0}"
-      MAX_POR_IP: "${MAX_POR_IP:-4}"
+      # Conexiones por IP. Varios celulares del mismo operador salen por una sola IP (NAT),
+      # así que con 4 el quinto se queda afuera en un evento con mucha gente.
+      MAX_POR_IP: "${MAX_POR_IP:-10}"
       CLAVE_ESTADISTICAS: "${CLAVE_ESTADISTICAS:-}"   # clave de /estadisticas (la genera start.sh)
       METRICAS: /data/metricas
       DATOS: /data/build
@@ -80,7 +82,7 @@ services:
       - ALL
     security_opt:
       - no-new-privileges:true
-    mem_limit: 512m
+    mem_limit: 1g        # el puente mantiene una conexión WebRTC por jugador: con 60, 512m queda corto
 
   studio:
     build: ./studio
