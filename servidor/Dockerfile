@@ -16,9 +16,11 @@ COPY preparar-motor.sh ./
 RUN sh preparar-motor.sh
 
 # ---- 2. Imagen final ------------------------------------------------------------
-# Debian 13 (glibc 2.41) con las bibliotecas de 32 bits: ReGameDLL y YaPB piden
-# glibc 2.38 o más nueva. El servidor es de 32 bits; en una Mac con chip M corre emulado.
-FROM --platform=linux/amd64 debian:trixie-slim
+# Debian forky (glibc 2.43) con las bibliotecas de 32 bits. Tiene que ser forky y no
+# trixie (glibc 2.41): el yapb.so que viene en la release «continuous» de CS16Client pide
+# GLIBC_2.43 y en trixie los bots no cargan («version `GLIBC_2.43' not found»), así que
+# las salas arrancan sin bots. El servidor es de 32 bits; en una Mac con chip M corre emulado.
+FROM --platform=linux/amd64 debian:forky-slim
 RUN dpkg --add-architecture i386 && apt-get update && apt-get install -y --no-install-recommends libc6:i386 libstdc++6:i386 libgcc-s1:i386 unzip && rm -rf /var/lib/apt/lists/* && useradd --uid 10001 --create-home --home-dir /home/xash xash
 COPY --from=descarga /tmp/dl/motor/ /opt/xash/
 COPY entrypoint.sh /usr/local/bin/servidor-cs
