@@ -82,7 +82,7 @@ curl -fsSL https://raw.githubusercontent.com/shugavibes/sla-cs16-web/main/deploy
 ```
 
 Instala Docker, abre solo los puertos necesarios, pone HTTPS automático y levanta dos salas
-de 30 jugadores, sin bots (60 lugares; el motor topea en 32 por sala). En los servidores públicos **cada jugador usa sus propios archivos de CS 1.6**
+de 32 jugadores, sin bots (64 lugares; 32 es el techo del motor por sala). En los servidores públicos **cada jugador usa sus propios archivos de CS 1.6**
 (los elige una vez desde su compu y quedan en su navegador; no se suben a ningún lado):
 así no se reparte contenido de Valve. Todo el detalle — arquitectura, dominios, costos,
 cómo crecer — en **[docs/online.md](docs/online.md)**.

@@ -34,7 +34,10 @@ mp_c4timer 35
 mp_startmoney 16000
 mp_friendlyfire 0
 mp_autoteambalance 1
-mp_limitteams 2
+// Equipos parejos (diferencia de 1 como máximo). Con las salas llenas importa: de_inferno
+// tiene 16 lugares donde aparecer por equipo, así que un 17 contra 15 dejaría a alguien
+// sin spawnear. Con 1, a lo sumo queda 16 contra 16.
+mp_limitteams 1
 mp_autokick 0
 mp_flashlight 1
 mp_footsteps 1

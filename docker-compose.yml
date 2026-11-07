@@ -61,9 +61,10 @@ services:
       CONTRASENA: "${CONTRASENA:-}"
       ARCHIVOS: "${ARCHIVOS:-servidor}"
       CONFIAR_PROXY: "${CONFIAR_PROXY:-0}"
-      # Conexiones por IP. Varios celulares del mismo operador salen por una sola IP (NAT),
-      # así que con 4 el quinto se queda afuera en un evento con mucha gente.
-      MAX_POR_IP: "${MAX_POR_IP:-10}"
+      # Conexiones por IP. En un evento presencial toda la gente sale por la misma IP
+      # pública (el Wi-Fi del lugar), así que un límite bajo deja afuera a la mayoría.
+      # Por encima del cupo total para que nunca sea el que frena. 0 lo desactiva.
+      MAX_POR_IP: "${MAX_POR_IP:-70}"
       CLAVE_ESTADISTICAS: "${CLAVE_ESTADISTICAS:-}"   # clave de /estadisticas (la genera start.sh)
       METRICAS: /data/metricas
       DATOS: /data/build

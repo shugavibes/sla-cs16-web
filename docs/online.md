@@ -99,7 +99,7 @@ cobrarse. Apagarlo no alcanza.
    ```
 
    Instala Docker, abre solo los puertos que hacen falta (SSH, 80, 443 y 27018/UDP),
-   baja los archivos del juego y arranca dos salas de 30 jugadores, sin bots. Al final muestra el link: si no
+   baja los archivos del juego y arranca dos salas de 32 jugadores, sin bots. Al final muestra el link: si no
    pasaste un dominio, usa `https://IP-CON-GUIONES.sslip.io`, que apunta a tu servidor
    sin configurar nada.
 4. **(Opcional) Dominio propio**, por ejemplo `juego.slatv.live`: creá un registro DNS

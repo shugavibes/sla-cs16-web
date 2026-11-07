@@ -152,16 +152,19 @@ env_set HOST_UID "$(id -u):$(id -g)"
 # en 32 jugadores por sala, pida lo que se le pida — con +maxplayers 64 arranca igual con
 # «32 player server started». La contra es que la gente de una sala no juega con la otra.
 # Sin bots porque juegan aunque la sala esté vacía y gastan CPU para nadie.
-# Los mapas tienen que tener lugares donde aparecer para esa cantidad: de_dust2 tiene 40
-# (20 por equipo) y de_inferno 32 (16 por equipo); con 30 jugadores son 15 por equipo.
+# Ojo con el mapa: tiene que tener lugares donde aparecer para esa cantidad, o queda gente
+# sin spawnear. Contados en los mapas que trae el juego: de_dust2 40 (20 por equipo),
+# de_inferno 32 (16), de_aztec 34, de_train 24, de_nuke y cs_assault 20. Con 32 jugadores
+# (16 por equipo) solo de_dust2 tiene margen; de_inferno entra exacto, y por eso
+# server.cfg.template usa mp_limitteams 1, que fuerza equipos parejos.
 if [ ! -s config/salas.conf ]; then
   nombre=$(env_get NOMBRE_SERVIDOR | sed 's/|/·/g')
   {
     sed -n '1,/^# ---/p' config/salas.conf.ejemplo
     printf '# id | nombre | mapa | jugadores | bots | dificultad\n'
     if [ "$MODO" = "online" ]; then
-      printf '1 | %s · Dust2   | de_dust2   | 30 | 0 | 0\n' "$nombre"
-      printf '2 | %s · Inferno | de_inferno | 30 | 0 | 0\n' "$nombre"
+      printf '1 | %s · Dust2   | de_dust2   | 32 | 0 | 0\n' "$nombre"
+      printf '2 | %s · Inferno | de_inferno | 32 | 0 | 0\n' "$nombre"
     else
       printf '1 | %s | %s | %s | %s | %s\n' "$nombre" "$(env_get MAPA)" "$(env_get MAX_JUGADORES)" \
         "$(env_get BOTS)" "$(env_get BOTS_DIFICULTAD)"
