@@ -98,8 +98,8 @@ curl -fsSL https://raw.githubusercontent.com/shugavibes/sla-cs16-web/main/deploy
   | sudo REPO=https://github.com/shugavibes/sla-cs16-web.git bash
 ```
 
-Instala Docker, abre solo los puertos necesarios, pone HTTPS automático y levanta tres
-salas (con bots, con más bots y solo humanos). En los servidores públicos **cada jugador usa sus propios archivos de CS 1.6**
+Instala Docker, abre solo los puertos necesarios, pone HTTPS automático y levanta una sala
+para hasta 32 jugadores, sin bots. En los servidores públicos **cada jugador usa sus propios archivos de CS 1.6**
 (los elige una vez desde su compu y quedan en su navegador; no se suben a ningún lado):
 así no se reparte contenido de Valve. Todo el detalle — arquitectura, dominios, costos,
 cómo crecer — en **[docs/online.md](docs/online.md)**.

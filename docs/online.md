@@ -46,8 +46,10 @@ SteamCMD, la herramienta oficial y gratuita de Valve para servidores dedicados.
 
 ## Subirlo a internet, paso a paso
 
-Hace falta un servidor alquilado (VPS) con Linux. Con 2 CPU y 4 GB de memoria alcanzan
-4 salas con bots cómodas.
+Hace falta un servidor alquilado (VPS) con Linux. Con 2 CPU y 4 GB de memoria alcanza una
+sala sin bots. Cada sala corre a 128 tick y los bots juegan todo el tiempo: con 2 CPU
+compartidas, varias salas con bots se quedan sin CPU y el juego se siente a tirones
+(ver `docs/pendiente-lag-animaciones.md`). Para varias salas con bots, CPU dedicada.
 
 | Proveedor | Plan de ejemplo | Precio aproximado | Cerca de Argentina |
 |---|---|---|---|
@@ -93,7 +95,7 @@ cobrarse. Apagarlo no alcanza.
    ```
 
    Instala Docker, abre solo los puertos que hacen falta (SSH, 80, 443 y 27018/UDP),
-   baja los archivos del juego y arranca tres salas (con bots, con más bots y solo humanos). Al final muestra el link: si no
+   baja los archivos del juego y arranca una sala para hasta 32 jugadores, sin bots. Al final muestra el link: si no
    pasaste un dominio, usa `https://IP-CON-GUIONES.sslip.io`, que apunta a tu servidor
    sin configurar nada.
 4. **(Opcional) Dominio propio**, por ejemplo `juego.slatv.live`: creá un registro DNS

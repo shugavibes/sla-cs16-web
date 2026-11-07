@@ -44,7 +44,8 @@ mp_consistency 0
 mp_roundrespawn_time 20
 
 // Bots YaPB (la cantidad y la dificultad salen de .env: BOTS y BOTS_DIFICULTAD)
-yb_join_after_player 0
+// Los bots esperan a que entre alguien: con la sala vacía no gastan CPU al servidor.
+yb_join_after_player 1
 yb_quota_mode "normal"
 
 exec listip.cfg
