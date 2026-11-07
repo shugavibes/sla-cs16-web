@@ -35,6 +35,10 @@ cd cs16-web
 ./start.sh
 ```
 
+En Windows, corré los comandos en **Git Bash** (viene con [Git para Windows](https://git-scm.com/download/win))
+con Docker Desktop abierto. Si clonaste antes de que el repo trajera `.gitattributes` y
+`./start.sh` falla con «Illegal option», volvé a clonar.
+
 La primera vez tarda (10 a 20 minutos en una Mac con chip M): arma las imágenes, baja
 los archivos del juego (~600 MB) y prepara todo. Después arranca en un minuto.
 

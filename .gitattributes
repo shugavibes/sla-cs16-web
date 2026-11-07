@@ -1,0 +1,4 @@
+# Todo el texto con finales de línea LF, también en Windows: los scripts corren dentro
+# de contenedores Linux y con CRLF el sh falla («set: Illegal option -»). Esto le gana a
+# core.autocrlf=true, que es lo que trae Git para Windows por defecto.
+* text=auto eol=lf
