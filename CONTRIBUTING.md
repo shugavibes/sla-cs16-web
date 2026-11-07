@@ -14,7 +14,7 @@ ones below.*
 
 Las partes que más vas a tocar se ven **sin rearmar nada**:
 
-- `web/cliente/` (salas, equipo, archivos propios, control con la mano) y `marca/web/`:
+- `web/cliente/` (salas, equipo, archivos propios) y `marca/web/`:
   recargá la página del juego.
 - `marca/juego/`, `mapas/` y los personajes: «Aplicar al juego» en el estudio
   (o `./texturas.sh aplicar`) y recargá.
@@ -26,7 +26,7 @@ Lo demás (`web/*.mjs`, `servidor/`, `studio/app/`, `docker-compose.yml`) se apl
 
 ```bash
 cd web && npm ci && cd ..
-node --test web/*.test.mjs web/cliente/*.test.mjs web/cliente/manos/*.test.mjs
+node --test web/*.test.mjs web/cliente/*.test.mjs
 (cd studio && pip install -r requirements.txt pytest && pytest -q)
 shellcheck -x start.sh stop.sh servidor.sh texturas.sh publicar-en-github.sh scripts/*.sh deploy/*.sh
 shellcheck -s sh servidor/entrypoint.sh servidor/preparar-motor.sh

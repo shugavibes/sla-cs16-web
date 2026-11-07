@@ -1,4 +1,4 @@
-/* Pantalla de entrada: salas, equipo, archivos propios y opción de manos.
+/* Pantalla de entrada: salas, equipo y archivos propios.
    Usa los colores de la página (--accent, --line, ...), así la marca los cambia sola. */
 
 .cs16-titulo {
@@ -16,7 +16,7 @@
 }
 .cs16-nota b { color: var(--text); font-weight: 600; }
 .cs16-nota[hidden], .cs16-salas[hidden], .cs16-archivos[hidden] { display: none; }
-/* las casillas ocultas (pantalla completa, mano en el celular): «label.check» del estilo
+/* las casillas ocultas (pantalla completa): «label.check» del estilo
    original les ponía display:flex y seguían a la vista */
 #lobby label[hidden] { display: none; }
 
@@ -73,10 +73,6 @@
 .cs16-equipo label:first-of-type span { border-left: 0; }
 .cs16-equipo input:checked + span { background: var(--accent); color: var(--accent-ink); font-weight: 600; }
 .cs16-equipo input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: -2px; }
-
-/* manos */
-.cs16-manos small { color: var(--muted); font-size: 12px; }
-.cs16-manos-ayuda { margin: -4px 0 2px 24px; }
 
 /* archivos propios */
 .cs16-archivos {

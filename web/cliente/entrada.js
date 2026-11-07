@@ -2,7 +2,6 @@
 //   - salas: si el servidor tiene varias, una lista para elegir a cuál entrar
 //   - equipo: elegirlo antes de entrar y aparecer jugando (sin pasar por el observador)
 //   - archivos propios: en servidores públicos, elegir la carpeta de CS 1.6 de Steam
-//   - manos: apuntar y disparar con la mano (cámara); ⌥/Alt + H cambia mano ↔ mouse
 // La página la carga sola (web/servidor.mjs la agrega al final de index.html).
 
 import * as archivos from './archivos.js';
@@ -182,37 +181,6 @@ async function mostrarArchivos() {
     else desbloquearJugar();
 }
 
-// ------------------------------------------------------------------ manos
-function crearManos() {
-    const fila = document.createElement('label');
-    fila.className = 'check cs16-manos';
-    fila.innerHTML = '<input id="manos" type="checkbox"> <span>Apuntar con la mano <small>(usa la cámara)</small></span>';
-    const ayuda = document.createElement('p');
-    ayuda.className = 'cs16-nota cs16-manos-ayuda';
-    ayuda.innerHTML = 'Hacé una pistolita con la mano frente a la cámara: el <b>índice</b> apunta, ' +
-        '<b>bajá el pulgar</b> para disparar y <b>abrí la mano</b> para recargar. Moverte sigue siendo con WASD. ' +
-        'Con <kbd>⌥</kbd>+<kbd>H</kbd> (Alt+H) cambiás entre la mano y el mouse cuando quieras. ' +
-        'La imagen de la cámara no sale de tu compu.';
-    const casilla = fila.querySelector('input');
-    const param = params.get('manos');
-    // En un celular o tablet sin mouse no tiene sentido (se juega con los controles táctiles)
-    if (matchMedia('(pointer: coarse)').matches && !matchMedia('(any-pointer: fine)').matches && param === null) {
-        fila.hidden = true;
-        ayuda.hidden = true;
-        return { fila, ayuda, casilla, demo: false };
-    }
-    casilla.checked = param !== null ? param !== '0' : leer('cs16:manos-activo') === '1';
-    const mostrar = () => { ayuda.hidden = !casilla.checked; };
-    mostrar();
-    casilla.addEventListener('change', () => {
-        mostrar();
-        guardar('cs16:manos-activo', casilla.checked ? '1' : '0');
-    });
-    return { fila, ayuda, casilla, demo: param === 'demo' };
-}
-
-const cargarManos = () => import('./manos/manos.js');
-
 // Aviso corto abajo (usa el mismo cartelito que la página)
 function avisoBreve(texto, ms = 7000) {
     const t = $('toast');
@@ -221,17 +189,6 @@ function avisoBreve(texto, ms = 7000) {
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), ms);
 }
-
-// ⌥/Alt + H en cualquier momento del juego: prende el control con la mano o cambia mano ↔ mouse
-window.addEventListener('keydown', (e) => {
-    if (!(e.altKey && !e.ctrlKey && !e.metaKey && e.code === 'KeyH')) return;
-    if (!document.body.classList.contains('playing')) return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    if (e.repeat) return;
-    cargarManos().then((m) => m.alternar({ demo: params.get('manos') === 'demo' }))
-        .catch((err) => console.error('[manos]', err));
-}, true);
 
 // ------------------------------------------------------------- métricas
 // Cuenta la visita (para /estadisticas): un número al azar que queda en este navegador, sin
@@ -314,8 +271,7 @@ if (form && jugar && lobby && !document.querySelector('.cs16-equipo')) {
 
     const equipo = crearEquipo();
     cajaArchivos = crearArchivos();
-    const manos = crearManos();
-    insertarAntesDeJugar(equipo, manos.fila, manos.ayuda, cajaArchivos);
+    insertarAntesDeJugar(equipo, cajaArchivos);
     sinPantallaCompleta();
     armarColumnas();
 
@@ -338,9 +294,5 @@ if (form && jugar && lobby && !document.querySelector('.cs16-equipo')) {
             .catch((e) => console.warn('[equipo]', e));
         // celular: botones grandes de «Comprar», «Compra rápida» y «Equipo»
         if ($('touch')?.checked) tactil.activar();
-        if (manos.casilla.checked) {
-            cargarManos().then((m) => m.iniciar({ demo: manos.demo }))
-                .catch((e) => console.error('[manos] no pude arrancar el control con la mano', e));
-        }
     });
 }

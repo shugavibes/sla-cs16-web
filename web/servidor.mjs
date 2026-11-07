@@ -30,7 +30,7 @@ const cfg = {
     password: env('CONTRASENA', ''),
     data: env('DATOS', '/data/build'),
     publicDir: env('PUBLICO', path.join(HERE, 'public')),
-    // Funciones propias de la página (salas, equipo, archivos propios, manos). Se leen en
+    // Funciones propias de la página (salas, equipo, archivos propios). Se leen en
     // cada pedido: con la carpeta montada, los cambios se ven al recargar.
     clienteDir: env('CLIENTE', path.join(HERE, 'cliente')),
     // Capa de marca (logo, colores, textos). Opcional; también se lee en cada pedido.

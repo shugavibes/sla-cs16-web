@@ -26,7 +26,7 @@
   la web lo pasa a la sala elegida. Cada jugador entra con su propia IP de loopback, así
   la sala los distingue.
 - **Caddy.** Pone HTTPS automático (Let's Encrypt). Hace falta: sin HTTPS el navegador no
-  deja usar la cámara (control con la mano) y algunas cosas de WebRTC.
+  deja usar algunas cosas de WebRTC.
 - **Un solo puerto para el juego.** Todo el tráfico de juego entra por UDP 27018, sin
   importar cuántas salas haya.
 

@@ -1,24 +1,22 @@
 # SLA · Counter-Strike 1.6 en el navegador
 
 Counter-Strike 1.6 que se juega desde el navegador, sin instalar nada, con la marca de
-[SLA](https://slatv.live). Trae salas con bots, un **estudio de personajes** para
-cambiarles las texturas, y un modo para **apuntar y disparar con la mano** usando la
-cámara.
+[SLA](https://slatv.live). Trae salas con bots y un **estudio de personajes** para
+cambiarles las texturas.
 
 **🎮 Jugar ahora: [sla-cs.vercel.app](https://sla-cs.vercel.app)** (el servidor de la comunidad
 SLA; pedí la contraseña en SLA).
 
 > **English summary.** Counter-Strike 1.6 in the browser (Xash3D FWGS compiled to
 > WebAssembly) with dedicated servers in Docker, a WebRTC ⇄ UDP bridge, multiple rooms,
-> a character texture studio and hand-tracking controls (MediaPipe). Public servers ask
+> and a character texture studio. Public servers ask
 > each player for their own CS 1.6 files (from Steam); no Valve content is in this repo.
 > Docs are in Spanish; issues and PRs in English are welcome too.
 
 | | |
 |---|---|
-| 🎮 **Jugar** | En el navegador (Chrome, Edge, Firefox o Safari). Con mouse y teclado, o con la mano. |
+| 🎮 **Jugar** | En el navegador (Chrome, Edge, Firefox o Safari). Con mouse y teclado. |
 | 🏠 **Salas** | Varias salas por servidor, cada una con su mapa, cupo y bots. Se elige al entrar. |
-| ✋ **Manos** | Pistolita con la mano: el índice apunta, bajar el pulgar dispara, mano abierta recarga. |
 | 🎨 **Estudio** | Cambiá la ropa de los personajes y velos en 3D antes de aplicarlo al juego. |
 | 🌐 **Online** | Un comando instala todo en un servidor alquilado, con HTTPS. |
 
@@ -53,24 +51,9 @@ los archivos del juego (~600 MB) y prepara todo. Después arranca en un minuto.
 - **Consola:** la tecla de al lado del 1 (en teclados en español, la de «º»).
 - No hay flechita del mouse: hacés clic, el navegador «atrapa» el mouse y apuntás con la
   mira. **Esc** lo suelta.
-- **⌥ Option + H** (Alt + H): cambiar entre la mano y el mouse cuando quieras.
 - En pantallas Retina y celulares los textos (nombres, quién mató a quién, chat, menús) y
   el resto del HUD se agrandan solos (al doble en una Mac con Retina). Para elegir otro tamaño, agregá `?hud=1.5`
   a la dirección (de 1 a 3; `?hud=1` lo deja como en la versión original).
-
-## Jugar con la mano
-
-Tildá **«Apuntar con la mano»** al entrar (o en el juego apretá **⌥/Alt + H**). El
-navegador pide la cámara.
-
-- Hacé una **pistolita**: la mira sigue la punta del **índice**. Con la mano cerca del
-  borde de la imagen, la vista sigue girando.
-- **Bajá el pulgar** como un gatillo para disparar.
-- **Mano abierta** un momento: recarga.
-
-Abajo a la izquierda hay un panel con lo que ve la cámara y botones de sensibilidad. La
-detección corre en tu navegador (MediaPipe Hands, guardado en el proyecto): la imagen de
-la cámara no sale de tu compu. Código y pruebas en `web/cliente/manos/`.
 
 ## Salas
 
@@ -126,14 +109,14 @@ jugadores. Ver [mapas/LEEME.md](mapas/LEEME.md).
 |---|---|
 | `servidor/` | Las salas: servidores dedicados de CS 1.6 ([Xash3D FWGS](https://github.com/FWGS/xash3d-fwgs) + [ReGameDLL_CS](https://github.com/rehlds/ReGameDLL_CS) + bots [YaPB](https://github.com/yapb/yapb)). Linux 32 bits. |
 | `web/` | Node: la página (motor en WebAssembly, de [CSweb](https://github.com/santiagoPostacchini/CSweb)), estado de las salas, paquetes del juego y puente WebRTC ⇄ UDP. |
-| `web/cliente/` | Lo propio de la página: salas, equipo, archivos propios, celular, textos grandes y control con la mano. |
+| `web/cliente/` | Lo propio de la página: salas, equipo, archivos propios, celular y textos grandes. |
 | `studio/` | Estudio de personajes (Python): texturas de los `.mdl`, arma `valve.zip` y `mod.zip`. |
 | `marca/` | Marca SLA (página y juego). |
 | `mapas/` | Mapas y archivos de la comunidad. |
 | `caddy/`, `deploy/` | HTTPS e instalador para el modo online. |
 | `docs/` | Documentación (online, arquitectura). |
 
-Pruebas: `node --test web/*.test.mjs web/cliente/*.test.mjs web/cliente/manos/*.test.mjs`
+Pruebas: `node --test web/*.test.mjs web/cliente/*.test.mjs`
 y `cd studio && pytest`. Corren solas en cada pull request (GitHub Actions).
 
 ## Contribuir
@@ -173,5 +156,5 @@ públicos cada jugador usa los suyos.
 Gracias a [CSweb](https://github.com/santiagoPostacchini/CSweb),
 [webxash3d-fwgs](https://github.com/yohimik/webxash3d-fwgs),
 [Xash3D FWGS](https://github.com/FWGS/xash3d-fwgs),
-[CS16Client](https://github.com/Velaron/cs16-client), [ReGameDLL_CS](https://github.com/rehlds/ReGameDLL_CS),
-[YaPB](https://github.com/yapb/yapb) y [MediaPipe](https://github.com/google/mediapipe).
+[CS16Client](https://github.com/Velaron/cs16-client), [ReGameDLL_CS](https://github.com/rehlds/ReGameDLL_CS)
+y [YaPB](https://github.com/yapb/yapb).

@@ -70,7 +70,7 @@ services:
     volumes:
       - ./build:/data/build:ro
       - ./marca:/data/marca:ro              # logo, colores y textos de la página: se ven al recargar
-      - ./web/cliente:/app/cliente:ro       # salas, equipo, archivos propios, manos: idem
+      - ./web/cliente:/app/cliente:ro       # salas, equipo, archivos propios: idem
       - ./config/salas.conf:/config/salas.conf:ro
       - ./metricas:/data/metricas           # cuánta gente entra (lo único que la web escribe)
     read_only: true

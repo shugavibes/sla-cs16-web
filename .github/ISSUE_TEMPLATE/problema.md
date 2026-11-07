@@ -12,6 +12,6 @@ labels: bug
 1.
 2.
 
-**Dónde:** navegador y sistema (ej. Chrome en macOS), local / LAN / online, con mouse o con la mano.
+**Dónde:** navegador y sistema (ej. Chrome en macOS), local / LAN / online.
 
 **Mensajes** (si tenés): lo que muestra la página o `docker compose logs --tail 50 servidor web`.

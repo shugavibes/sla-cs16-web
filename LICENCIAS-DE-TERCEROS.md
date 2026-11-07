@@ -12,7 +12,6 @@ uno con su licencia:
 | [YaPB](https://github.com/yapb/yapb) | Bots | MIT | Binario bajado al armar `servidor/` |
 | [CSweb](https://github.com/santiagoPostacchini/CSweb) | Cliente web y puente WebRTC (base de `web/`) | MIT | `web/public/`, `web/rtc.mjs`, `web/servidor.mjs` (ver `web/LICENCIA-CSweb.txt`) |
 | [fflate](https://github.com/101arrowz/fflate) | Descompresión de los paquetes en el navegador | MIT | Dentro de `web/public/assets/index-*.js` |
-| [MediaPipe Hands](https://github.com/google/mediapipe) | Detección de la mano con la cámara | Apache-2.0 | `web/cliente/manos/vendor/` |
 | [three.js](https://github.com/mrdoob/three.js) | Visor 3D del estudio | MIT | `studio/static/vendor/` |
 | [Geist](https://github.com/vercel/geist-font) | Tipografía de la marca SLA | SIL OFL 1.1 | `marca/web/fuentes/`, `marca/fuente/fuentes/` |
 | [node-datachannel](https://github.com/murat-dogan/node-datachannel) | WebRTC en el servidor | MPL-2.0 | Dependencia npm de `web/` |

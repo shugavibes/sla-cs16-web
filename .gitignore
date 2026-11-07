@@ -12,7 +12,6 @@ __pycache__/
 .DS_Store
 # restos de actualizaciones
 .viejo/
-.manos-*.tar.gz
 .actualizacion-*.tar.gz
 
 # «Cerrado por ahora» (lo crea cerrar.sh en el servidor)

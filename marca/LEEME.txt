@@ -6,9 +6,6 @@ Todo lo que está en esta carpeta se ve sin rearmar nada:
   web/     La página del juego (http://localhost:27016). marca.css cambia colores y
            tipografía, marca.js cambia logo y textos. Se ve con solo recargar la página.
 
-           web/manos/ es el control con las manos (cámara): ver «Jugar con las manos»
-           en el README.
-
   juego/   Archivos que van tal cual adentro del juego (valve.zip), con la misma ruta
            que en el juego. Ahora: los colores del menú (cstrike/gfx/shell/colors.lst)
            y el color del HUD (cstrike/autoexec.cfg). Para verlos: «Aplicar al juego» en el estudio

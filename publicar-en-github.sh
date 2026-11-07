@@ -15,7 +15,7 @@ cd "$(dirname "$0")"
 . scripts/comun.sh
 
 NOMBRE="${1:-sla-cs16-web}"
-DESCRIPCION="Counter-Strike 1.6 en el navegador: salas con bots, estudio de personajes y control con la mano. Comunidad SLA."
+DESCRIPCION="Counter-Strike 1.6 en el navegador: salas con bots y estudio de personajes. Comunidad SLA."
 
 command -v git >/dev/null 2>&1 || falla "Falta git (en Mac: xcode-select --install)."
 if ! command -v gh >/dev/null 2>&1; then
@@ -72,8 +72,7 @@ if grep -rqs 'USUARIO/REPO' README.md docs/ deploy/; then
   git push -q
 fi
 gh repo edit "$USUARIO/$NOMBRE" --enable-issues \
-  --add-topic counter-strike --add-topic cs16 --add-topic webassembly --add-topic xash3d \
-  --add-topic mediapipe --add-topic hand-tracking >/dev/null 2>&1 || true
+  --add-topic counter-strike --add-topic cs16 --add-topic webassembly --add-topic xash3d >/dev/null 2>&1 || true
 
 printf '\n  %s✅ Publicado%s  https://github.com/%s/%s\n\n' "$_B" "$_N" "$USUARIO" "$NOMBRE"
 printf '  Para ponerlo online en un servidor: ver docs/online.md\n\n'

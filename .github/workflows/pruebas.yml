@@ -20,10 +20,10 @@ jobs:
           node-version: 22
       - name: Dependencias de la web
         run: npm ci --prefix web --no-audit --no-fund
-      - name: Pruebas de la web (salas, archivos propios, control con la mano)
-        run: node --test web/*.test.mjs web/cliente/*.test.mjs web/cliente/manos/*.test.mjs
+      - name: Pruebas de la web (salas, archivos propios)
+        run: node --test web/*.test.mjs web/cliente/*.test.mjs
       - name: Sintaxis de JavaScript
-        run: for f in web/*.mjs web/cliente/*.js web/cliente/manos/*.js marca/web/*.js; do node --check "$f"; done
+        run: for f in web/*.mjs web/cliente/*.js marca/web/*.js; do node --check "$f"; done
       - name: Parche del cliente (tiene que encontrar cada texto una vez)
         run: cp -r web/public /tmp/public && node web/parche-cliente.mjs /tmp/public
 

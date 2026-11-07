@@ -1,4 +1,0 @@
-MediaPipe Hands 0.4.1675469240 (paquete npm @mediapipe/hands), de Google.
-Licencia Apache-2.0: https://github.com/google/mediapipe/blob/master/LICENSE
-Se sirve desde acá para que el detector de manos funcione sin internet y la imagen
-de la cámara nunca salga de la compu.
